@@ -86,11 +86,6 @@ function updateDependencies(removeDevDeps, addDevDeps, removeRuntimeDeps, addRun
     console.log("Update dependencies successfully!");
 }
 
-function start() {
-    console.log("Starting server...");
-    execSync("yarn vite", { stdio: "inherit" });
-}
-
 (function main() {
     try {
         deleteFiles(filesToDelete);
@@ -100,7 +95,6 @@ function start() {
             runtimeDependenciesToRemove,
             runtimeDependenciesToAdd
         );
-        start();
     } catch (error) {
         console.error("Error:", error.message);
         process.exit(1);

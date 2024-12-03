@@ -1,8 +1,9 @@
 [package]
-name = "subtitle-webapp-crate"
-version = "0.1.0"
 authors = ["mengen.dai <mengen.dai@advantest.com>"]
-edition = "2018"
+name = "subtitle-webapp-crate"
+version = "0.0.0"
+edition = "2021"
+publish = false
 
 [lib]
 crate-type = ["cdylib", "rlib"]
@@ -19,7 +20,17 @@ console_error_panic_hook = { version = "0.1", optional = true }
 [dependencies.web-sys]
 version = "0.3"
 features = [
-    "console"
+    "Window",
+    "console",
+    "Navigator",
+    "AudioNode",
+    "AudioContext",
+    "MediaStream",
+    "MediaDevices",
+    "MediaRecorder",
+    "MediaDeviceInfo",
+    "MediaRecorderOptions",
+    "MediaStreamConstraints"
 ]
 
 [dev-dependencies]
