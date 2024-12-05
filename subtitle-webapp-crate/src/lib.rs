@@ -1,10 +1,8 @@
 use wasm_bindgen::prelude::*;
 use web_sys::AudioNode;
+use utils::devices_utils;
 
-mod js_sys_utils;
-mod media_devices_utils;
 mod utils;
-mod web_sys_utils;
 
 #[wasm_bindgen]
 extern "C" {
@@ -23,7 +21,7 @@ pub async fn using_audio_demo() -> Result<AudioNode, JsValue> {
     // 创建 AudioContext 用于音频处理
     let audio_context = web_sys::AudioContext::new()?;
     // 获取麦克风流
-    let microphone_stream = media_devices_utils::get_audio_device_stream().await;
+    let microphone_stream = devices_utils::get_audio_device_stream().await;
     // 创建 MediaStreamSourceNode
     let source_node = audio_context.create_media_stream_source(&microphone_stream)?;
     // 创建 AnalyserNode

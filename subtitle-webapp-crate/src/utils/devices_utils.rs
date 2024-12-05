@@ -1,5 +1,5 @@
-use crate::js_sys_utils;
-use crate::web_sys_utils;
+use crate::utils::js_sys_utils;
+use crate::utils::web_sys_utils;
 use wasm_bindgen::JsCast;
 pub async fn get_audio_device_stream() -> web_sys::MediaStream {
     let media_devices = web_sys_utils::media_devices();
