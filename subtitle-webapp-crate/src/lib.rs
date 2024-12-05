@@ -36,7 +36,7 @@ pub async fn using_audio_demo() -> Result<AudioNode, JsValue> {
     analyser_node.connect_with_audio_node(&destination_node)
 }
 
-
+/// 这是一个 Demo 方法，主要目的是演示如何在 WebAssembly 中使用 tokio 的消息传递的功能
 #[wasm_bindgen]
 pub fn using_worker_demo() {
     console_log!("using_worker_demo");
