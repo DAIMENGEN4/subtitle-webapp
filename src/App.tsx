@@ -1,19 +1,29 @@
+import {Button} from "antd";
 import "./App.css";
-import {useEffect} from "react";
+// import AudioRecorder from "./audio-recorder";
 import * as wasm from "subtitle-webapp-crate";
+import {useWorker} from "@Root/workers/hooks/use-worker.tsx";
 
 function App() {
-    useEffect(() => {
-        // wasm.greet();
-        wasm.using_web_sys_console_log_1("using_web_sys_console_log_1");
-        wasm.using_web_sys_console_log_2("using_web_sys_console_log_2", 200000);
-        wasm.using_web_sys_get_user_media().then(() => {
-            wasm.using_web_sys_get_input_device().then(console.log);
-        });
-    }, []);
+    useWorker({
+        workerPath: new URL("@Workers/worker-demo.ts", import.meta.url),
+    });
+
     return (
         <>
             <h1>SubtitleAI</h1>
+            <br/>
+            <br/>
+            <br/>
+            <br/>
+            <br/>
+            <br/>
+            {/* <AudioRecorder/> */}
+            <Button onClick={() => {
+                wasm.using_audio_demo().then(() => {
+                    console.log("start recording");
+                });
+            }}>Button</Button>
         </>
     )
 }

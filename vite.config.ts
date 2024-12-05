@@ -10,7 +10,8 @@ export default defineConfig({
   },
   resolve: {
     alias: {
-      "@Root": "/src"
+      "@Root": "/src",
+      "@Workers": "/src/workers"
     }
   },
   plugins: [
