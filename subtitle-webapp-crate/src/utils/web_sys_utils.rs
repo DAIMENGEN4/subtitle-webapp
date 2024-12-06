@@ -25,6 +25,30 @@ pub fn media_stream_constraints() -> web_sys::MediaStreamConstraints {
     web_sys::MediaStreamConstraints::new()
 }
 
+/// https://developer.mozilla.org/zh-CN/docs/Web/API/AudioWorkletNode
+pub fn audio_worklet_node(context: &web_sys::BaseAudioContext, name: &str) -> web_sys::AudioWorkletNode {
+    let result = web_sys::AudioWorkletNode::new(context, name);
+    match result {
+        Ok(node) => node,
+        Err(error) => panic!("Failed to create an AudioWorkletNode. {:?}", error),
+    }
+}
+
+/// https://developer.mozilla.org/zh-CN/docs/Web/API/AudioWorkletNode
+pub fn audio_worklet_node_with_options(context: &web_sys::BaseAudioContext, name: &str, options: &web_sys::AudioWorkletNodeOptions) -> web_sys::AudioWorkletNode {
+    let result = web_sys::AudioWorkletNode::new_with_options(context, name, options);
+    match result {
+        Ok(node) => node,
+        Err(error) => panic!("Failed to create an AudioWorkletNode. {:?}", error),
+    }
+}
+
+/// https://udn.realityripple.com/docs/Web/API/AudioWorkletNodeOptions
+/// https://developer.mozilla.org/en-US/docs/Web/API/AudioWorkletNode/AudioWorkletNode
+pub fn audio_worklet_node_options() -> web_sys::AudioWorkletNodeOptions {
+    web_sys::AudioWorkletNodeOptions::new()
+}
+
 // /// https://developer.mozilla.org/zh-CN/docs/Web/API/Window/requestAnimationFrame
 // pub fn request_animation_frame(callback: &::js_sys::Function) {
 //     let result = window().request_animation_frame(callback);

@@ -1,13 +1,11 @@
-import {Button} from "antd";
 import "./App.css";
-// import AudioRecorder from "./audio-recorder";
-import * as wasm from "subtitle-webapp-crate";
-import {useWorker} from "@Root/workers/hooks/use-worker.tsx";
+import {Button} from "antd";
+import init from "subtitle-webapp-crate";
 
 function App() {
-    useWorker({
-        workerPath: new URL("@Workers/worker-demo.ts", import.meta.url),
-    });
+    // useWorker({
+    //     workerPath: new URL("@WebWorker/worker-demo.ts", import.meta.url),
+    // });
 
     return (
         <>
@@ -18,11 +16,12 @@ function App() {
             <br/>
             <br/>
             <br/>
-            {/* <AudioRecorder/> */}
+            {/*<AudioRecorder/>*/}
+            {/*<AudioWorkletDemo/>*/}
             <Button onClick={() => {
-                wasm.using_audio_demo().then(() => {
-                    console.log("start recording");
-                });
+                // init().then(wasm => wasm.greet());
+                // init().then(wasm => wasm.using_worker_demo());
+                init().then(wasm => wasm.using_audio_stream());
             }}>Button</Button>
         </>
     )

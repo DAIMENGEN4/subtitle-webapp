@@ -6,7 +6,7 @@ edition = "2021"
 publish = false
 
 [lib]
-crate-type = ["cdylib", "rlib"]
+crate-type = ["cdylib"]
 
 [features]
 default = ["console_error_panic_hook"]
@@ -20,8 +20,7 @@ console_error_panic_hook = { version = "0.1", optional = true }
 [dependencies.tokio]
 version = "1.42"
 features = [
-    "rt",
-    "sync"
+    "sync",
 ]
 
 [dependencies.web-sys]
@@ -31,14 +30,21 @@ features = [
     "console",
     "Navigator",
     "Worker",
+    "Url",
     "Blob",
     "BlobEvent",
+    "BlobPropertyBag",
     "HtmlMediaElement",
     "AudioNode",
     "AnalyserNode",
-    "AudioContext",
     "AudioBuffer",
+    "AudioWorklet",
+    "AudioContext",
+    "AudioWorkletNode",
     "AudioDestinationNode",
+    "AudioBufferSourceNode",
+    "AudioWorkletNodeOptions",
+    "OfflineAudioContext",
     "MediaStream",
     "MediaDevices",
     "MediaRecorder",
