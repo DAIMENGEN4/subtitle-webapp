@@ -1,7 +1,7 @@
 use wasm_bindgen::prelude::*;
 
 #[wasm_bindgen]
-pub struct AudioProcessor(pub Box<dyn FnMut(&mut [f32]) -> bool>);
+pub struct AudioProcessor(Box<dyn FnMut(&mut [f32]) -> bool>);
 
 #[wasm_bindgen]
 impl AudioProcessor {
