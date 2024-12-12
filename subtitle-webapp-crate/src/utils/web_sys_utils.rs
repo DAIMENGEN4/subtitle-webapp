@@ -49,10 +49,12 @@ pub fn audio_worklet_node_options() -> web_sys::AudioWorkletNodeOptions {
     web_sys::AudioWorkletNodeOptions::new()
 }
 
-// /// https://developer.mozilla.org/zh-CN/docs/Web/API/Window/requestAnimationFrame
-// pub fn request_animation_frame(callback: &::js_sys::Function) {
-//     let result = window().request_animation_frame(callback);
-//     if let Err(error) = result {
-//         panic!("Failed to request animation frame. {:?}", error);
-//     }
-// }
+
+/// https://developer.mozilla.org/zh-CN/docs/Web/API/AudioContext
+pub fn audio_context() -> web_sys::AudioContext {
+    let result = web_sys::AudioContext::new();
+    match result {
+        Ok(context) => context,
+        Err(error) => panic!("Failed to create an AudioContext. {:?}", error),
+    }
+}

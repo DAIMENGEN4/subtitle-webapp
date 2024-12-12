@@ -1,59 +1,47 @@
 [package]
-authors = ["mengen.dai <mengen.dai@advantest.com>"]
 name = "subtitle-webapp-crate"
+authors = ["mengen.dai <mengen.dai@advantest.com>"]
 version = "0.0.0"
 edition = "2021"
-publish = false
 
 [lib]
 crate-type = ["cdylib"]
 
 [features]
-default = ["console_error_panic_hook"]
+default = [
+    "web-sys/Url",
+    "web-sys/Node",
+    "web-sys/Navigator",
+    "web-sys/MessagePort",
+    "web-sys/MediaStream",
+    "web-sys/MediaDevices",
+    "web-sys/MediaStreamConstraints",
+    "web-sys/MediaStreamAudioSourceNode",
+    "web-sys/MediaStreamAudioSourceOptions",
+    "web-sys/Worker",
+    "web-sys/WorkerType",
+    "web-sys/WorkerOptions",
+    "web-sys/AudioContext",
+    "web-sys/AudioWorklet",
+    "web-sys/AudioWorkletNode",
+    "web-sys/AudioDestinationNode",
+    "web-sys/AudioWorkletNodeOptions",
+    "web-sys/Window",
+    "web-sys/console",
+    "console_error_panic_hook"
+]
 
 [dependencies]
-js-sys = "0.3.76"
-wasm-bindgen = "0.2.99"
-wasm-bindgen-futures = "0.4.49"
-console_error_panic_hook = { version = "0.1.7", optional = true }
+js-sys = "0.3"
+web-sys = "0.3"
+wasm-bindgen = "0.2"
+wasm-bindgen-futures = "0.4"
 
-[dependencies.tokio]
-version = "1.42"
-features = [
-    "sync",
-]
-
-[dependencies.web-sys]
-version = "0.3.76"
-features = [
-    "Window",
-    "console",
-    "Navigator",
-    "Worker",
-    "Url",
-    "Blob",
-    "BlobEvent",
-    "BlobPropertyBag",
-    "HtmlMediaElement",
-    "AudioNode",
-    "AnalyserNode",
-    "AudioBuffer",
-    "AudioWorklet",
-    "AudioContext",
-    "AudioWorkletNode",
-    "AudioDestinationNode",
-    "AudioBufferSourceNode",
-    "AudioWorkletNodeOptions",
-    "OfflineAudioContext",
-    "MediaStream",
-    "MediaDevices",
-    "MediaRecorder",
-    "MediaDeviceInfo",
-    "MediaRecorderOptions",
-    "MediaStreamConstraints",
-    "MediaStreamAudioSourceNode",
-    "MediaStreamAudioSourceOptions"
-]
+# The `console_error_panic_hook` crate provides better debugging of panics by
+# logging them with `console.error`. This is great for development, but requires
+# all the `std::fmt` and `std::panicking` infrastructure, so isn't great for
+# code size when deploying.
+console_error_panic_hook = { version = "0.1", optional = true }
 
 [dev-dependencies]
 wasm-bindgen-test = "0.3"
@@ -61,3 +49,7 @@ wasm-bindgen-test = "0.3"
 [profile.release]
 # Tell `rustc` to optimize for small code size.
 opt-level = "s"
+
+# Also don't forget to compile in release mode for the smallest binaries! For larger applications you'll likely also want to turn on LTO to generate the smallest binaries
+# https://rustwasm.github.io/docs/wasm-bindgen/examples/add.html
+lto = true
