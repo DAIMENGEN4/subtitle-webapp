@@ -24,7 +24,7 @@ pub async fn start_realtime_translate(url: &str) {
         let data = js_sys::Float32Array::new(&event.data()).to_vec();
         shared_data.extend(data);
         if shared_data.len() >= 3072 {
-            web_sys::console::log_2(&"Origin Shared data length: ".into(), &shared_data.len().into());
+            // web_sys::console::log_2(&"Origin Shared data length: ".into(), &shared_data.len().into());
             // 重新采样到 16000Hz
             let mut resampled = if sample_rate != target_sample_rate {
                 let interpolator = dasp::interpolate::linear::Linear::new(shared_data[0], shared_data[1]);
@@ -38,12 +38,12 @@ pub async fn start_realtime_translate(url: &str) {
             } else {
                 shared_data.to_vec()
             };
-            web_sys::console::log_2(&"Resampled Shared data length: ".into(), &resampled.len().into());
+            // web_sys::console::log_2(&"Resampled Shared data length: ".into(), &resampled.len().into());
             // 重置共享数据容器
             shared_data.clear();
             // 应用带通滤波器
             apply_bandpass_filter(&mut resampled, target_sample_rate as u32, 300.0, 3000.0, 2.0);
-            web_sys::console::log_2(&"Filter Resampled Shared data length: ".into(), &resampled.len().into());
+            // web_sys::console::log_2(&"Filter Resampled Shared data length: ".into(), &resampled.len().into());
             let max_abs = resampled.iter().map(|arg0: &f32| f32::abs(*arg0)).fold(0.0f32, f32::max);
             // 更新增益
             if max_abs * current_gain > 1f32 {
@@ -51,7 +51,7 @@ pub async fn start_realtime_translate(url: &str) {
             } else if max_abs * current_gain < 0.8f32 {
                 current_gain = max_gain.min(current_gain * 1.1f32);
             }
-            web_sys::console::log_2(&"Current Gain: ".into(), &current_gain.into());
+            // web_sys::console::log_2(&"Current Gain: ".into(), &current_gain.into());
             // 简单的噪声降低（你可能需要使用更复杂的方法）
             let noise_reduced: Vec<i16> = resampled
                 .iter()
@@ -62,7 +62,9 @@ pub async fn start_realtime_translate(url: &str) {
                     (sample * current_gain * i16::MAX as f32) as i16 // 乘以增益, 对音量进行放大
                 })
                 .collect();
-            web_sys::console::log_2(&"Noise Reduced Shared data length: ".into(), &noise_reduced.len().into());
+            // web_sys::console::log_2(&"Noise Reduced Shared data length: ".into(), &noise_reduced.len().into());
+            let predict = voice_activity_predict(&noise_reduced);
+            web_sys::console::log_2(&"Predict: ".into(), &predict.into());
         }
         // web_sys::console::log_2(&"Received message: ".into(), &array.into());
         // web_sys::console::log_2(&"Sample Rate: {}".into(), &JsValue::from(sample_rate));
@@ -108,6 +110,15 @@ fn apply_bandpass_filter(audio: &mut [f32], sr: u32, low_freq: f32, high_freq: f
     for sample in audio.iter_mut() {
         *sample = filter.run(*sample) * gain;
     }
+}
+
+fn voice_activity_predict(data: &[i16]) -> f32 {
+    let mut sum: i64 = 0;
+    for &datum in data {
+        sum += (datum as i64).abs() * (datum as i64).abs();
+    }
+    let average_volume = sum as f32 / (data.len() as f32);
+    average_volume
 }
 
 
