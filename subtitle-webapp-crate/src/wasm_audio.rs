@@ -19,21 +19,22 @@ pub async fn start_realtime_translate(url: &str) {
     let mut shared_data: Vec<f32> = Vec::new();
     let mut current_gain = 1f32;
     let mut max_gain = 20f32;
+    let target_sample_rate = 16000f32;
     let closure = Closure::wrap(Box::new(move |event: web_sys::MessageEvent| {
         let data = js_sys::Float32Array::new(&event.data()).to_vec();
         shared_data.extend(data);
         if shared_data.len() >= 3072 {
             web_sys::console::log_2(&"Origin Shared data length: ".into(), &shared_data.len().into());
             // 重新采样到 16000Hz
-            let mut resampled = if sample_rate != 16000f32 {
+            let mut resampled = if sample_rate != target_sample_rate {
                 let interpolator = dasp::interpolate::linear::Linear::new(shared_data[0], shared_data[1]);
                 let source = dasp::signal::from_iter(shared_data.iter().cloned());
                 let resampled = source.from_hz_to_hz(
                     interpolator,
                     sample_rate as f64,
-                    16000f64,
+                    target_sample_rate as f64,
                 );
-                resampled.take(shared_data.len() * 16000usize / sample_rate as usize).collect()
+                resampled.take(shared_data.len() * target_sample_rate as usize / sample_rate as usize).collect()
             } else {
                 shared_data.to_vec()
             };
@@ -41,7 +42,7 @@ pub async fn start_realtime_translate(url: &str) {
             // 重置共享数据容器
             shared_data.clear();
             // 应用带通滤波器
-            apply_bandpass_filter(&mut resampled, 16000, 300.0, 3000.0, 2.0);
+            apply_bandpass_filter(&mut resampled, target_sample_rate as u32, 300.0, 3000.0, 2.0);
             web_sys::console::log_2(&"Filter Resampled Shared data length: ".into(), &resampled.len().into());
             let max_abs = resampled.iter().map(|arg0: &f32| f32::abs(*arg0)).fold(0.0f32, f32::max);
             // 更新增益
