@@ -2,13 +2,14 @@ use crate::utils::{js_sys_utils, panic_utils, web_sys_utils};
 use wasm_bindgen::prelude::*;
 
 #[derive(serde::Serialize, serde::Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct ProcessorOptions {
-    frame_samples: u32,
+    target_frame_size: u32,
 }
 
 impl ProcessorOptions {
-    pub fn new(frame_samples: u32) -> ProcessorOptions {
-        ProcessorOptions { frame_samples }
+    pub fn new(target_frame_size: u32) -> ProcessorOptions {
+        ProcessorOptions { target_frame_size }
     }
 }
 
