@@ -10,11 +10,9 @@ export const RealtimeTranslate = () => {
                 SileroVadV5.new().then(model => {
                     const url = new URL("@AudioWorklet/audio-translate-processor.ts", import.meta.url);
                     const href = url.href;
-                    wasm.start_realtime_translate(href, (data: Float32Array) => {
-                        // log.debug(data);
-                        model.process(data).then(result => {
-                            log.debug(result);
-                        })
+                    wasm.start_realtime_translate(href, async (data: Float32Array) => {
+                        const speechProbabilities = await model.process(data);
+                        return speechProbabilities.isSpeech;
                     }).then(log.debug);
                 });
             }}>Start Translate Audio</Button>

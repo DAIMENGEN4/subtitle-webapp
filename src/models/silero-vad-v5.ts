@@ -6,6 +6,22 @@ export interface SpeechProbabilities {
     isSpeech: number
 }
 
+export const SpeechThreshold = {
+    /**
+     * 这个阈值用于判断模型返回的值是否表示有语音。
+     * 如果模型返回的值大于此阈值，则认为是有语音活动。这一值应在0-1之间。
+     * @private
+     */
+    positiveSpeechThreshold: 0.5,
+    /**
+     * 这个阈值用于判断模型返回的值是否表示没有语音。
+     * 如果模型返回的值小于此阈值，则认为是没有语音活动。
+     * 这一值通常设置为比positiveSpeechThreshold少0.15，这样能够更准确地区分五语音状态
+     * @private
+     */
+    negativeSpeechThreshold: 0.5 - 0.15
+};
+
 function getNewState(ortInstance: typeof ort) {
     const zeroes = Array(2 * 128).fill(0)
     return new ortInstance.Tensor("float32", zeroes, [2, 1, 128])

@@ -20,20 +20,21 @@ pub async fn start_realtime_translate(url: &str, vad_callback: js_sys::Function)
     let audio_worklet = audio_context.audio_worklet().unwrap();
     js_sys_utils::try_into_result(audio_worklet.add_module(url)).await;
     let microphone_stream = get_audio_device_stream().await;
-    let source_node = audio_context
-        .create_media_stream_source(&microphone_stream)
-        .unwrap();
+    let source_node = audio_context.create_media_stream_source(&microphone_stream).unwrap();
     let audio_worklet_node_options = web_sys_utils::audio_worklet_node_options();
     let processor_options = ProcessorOptions::new(512);
     let js_value_processor_options = serde_wasm_bindgen::to_value(&processor_options).unwrap();
     audio_worklet_node_options.set_processor_options(Some(&js_value_processor_options.into()));
     let audio_worklet_node = web_sys_utils::audio_worklet_node_with_options(&audio_context, "AudioTranslateProcessor", &audio_worklet_node_options);
     let message_port = audio_worklet_node.port().unwrap();
-    let sample_rate = audio_context.sample_rate();
     let closure = Closure::wrap(Box::new(move |event: web_sys::MessageEvent| {
         let data = js_sys::Float32Array::new(&event.data()).to_vec();
-        web_sys::console::log_2(&"SampleRate: ".into(), &sample_rate.into());
-        vad_callback.call1(&JsValue::NULL, &JsValue::from(data)).unwrap();
+        let js_value = vad_callback.call1(&JsValue::NULL, &JsValue::from(data)).unwrap();
+        wasm_bindgen_futures::spawn_local(async move {
+            let promise = js_sys::Promise::from(js_value);
+            let result = wasm_bindgen_futures::JsFuture::from(promise).await.unwrap();
+            web_sys::console::log_1(&result);
+        });
     }) as Box<dyn FnMut(_)>);
     message_port.set_onmessage(Some(closure.as_ref().unchecked_ref()));
     closure.forget();
