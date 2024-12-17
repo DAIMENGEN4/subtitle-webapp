@@ -28,6 +28,7 @@ export default defineConfig({
     ],
     optimizeDeps: {
         exclude: [
+            "onnxruntime-web",
             "subtitle-webapp-crate"
         ]
     }
