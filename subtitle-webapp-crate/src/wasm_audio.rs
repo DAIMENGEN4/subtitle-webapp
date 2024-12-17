@@ -27,9 +27,19 @@ pub async fn start_realtime_translate(url: &str, vad_callback: js_sys::Function)
     audio_worklet_node_options.set_processor_options(Some(&js_value_processor_options.into()));
     let audio_worklet_node = web_sys_utils::audio_worklet_node_with_options(&audio_context, "AudioTranslateProcessor", &audio_worklet_node_options);
     let message_port = audio_worklet_node.port().unwrap();
+    let max_audio_gain = 2f32;
+    let mut current_audio_gain = 1f32;
     let closure = Closure::wrap(Box::new(move |event: web_sys::MessageEvent| {
-        let data = js_sys::Float32Array::new(&event.data()).to_vec();
-        let js_value = vad_callback.call1(&JsValue::NULL, &JsValue::from(data)).unwrap();
+        let audio_frame = js_sys::Float32Array::new(&event.data()).to_vec();
+        // 对当前帧进行增益
+        let max_amplitude = audio_frame.iter().max_by(|a, b| a.partial_cmp(b).unwrap()).unwrap();
+        if max_amplitude * current_audio_gain > 1f32 {
+            current_audio_gain = max_audio_gain.min(0.9f32 / max_amplitude);
+        } else if max_amplitude * current_audio_gain < 0.5f32 {
+            current_audio_gain = max_audio_gain.max(0.5f32 / max_amplitude);
+        }
+        let audio_frame = audio_frame.iter().map(|x| x * current_audio_gain).collect::<Vec<_>>();
+        let js_value = vad_callback.call1(&JsValue::NULL, &JsValue::from(audio_frame)).unwrap();
         wasm_bindgen_futures::spawn_local(async move {
             let promise = js_sys::Promise::from(js_value);
             let result = wasm_bindgen_futures::JsFuture::from(promise).await.unwrap();
