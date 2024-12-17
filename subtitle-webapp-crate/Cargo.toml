@@ -13,6 +13,7 @@ default = [
     "dasp/interpolate-linear",
     "dasp/signal",
     "dasp/window",
+    "serde/derive",
     "web-sys/Url",
     "web-sys/Node",
     "web-sys/Navigator",
@@ -37,10 +38,12 @@ default = [
 
 [dependencies]
 dasp = "0.11"
+serde = "1.0"
 biquad = "0.4"
 js-sys = "0.3"
 web-sys = "0.3"
 wasm-bindgen = "0.2"
+serde-wasm-bindgen = "0.6"
 wasm-bindgen-futures = "0.4"
 
 # The `console_error_panic_hook` crate provides better debugging of panics by

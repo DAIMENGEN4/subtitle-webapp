@@ -1,6 +1,16 @@
 use crate::utils::{js_sys_utils, panic_utils, web_sys_utils};
-use biquad::{Biquad, Coefficients, DirectForm2Transposed, ToHertz, Type};
 use wasm_bindgen::prelude::*;
+
+#[derive(serde::Serialize, serde::Deserialize)]
+pub struct ProcessorOptions {
+    frame_samples: u32,
+}
+
+impl ProcessorOptions {
+    pub fn new(frame_samples: u32) -> ProcessorOptions {
+        ProcessorOptions { frame_samples }
+    }
+}
 
 #[wasm_bindgen]
 pub async fn start_realtime_translate(url: &str, vad_callback: js_sys::Function) {
@@ -12,7 +22,11 @@ pub async fn start_realtime_translate(url: &str, vad_callback: js_sys::Function)
     let source_node = audio_context
         .create_media_stream_source(&microphone_stream)
         .unwrap();
-    let audio_worklet_node = web_sys_utils::audio_worklet_node(&audio_context, "AudioTranslateProcessor");
+    let audio_worklet_node_options = web_sys_utils::audio_worklet_node_options();
+    let processor_options = ProcessorOptions::new(512);
+    let js_value_processor_options = serde_wasm_bindgen::to_value(&processor_options).unwrap();
+    audio_worklet_node_options.set_processor_options(Some(&js_value_processor_options.into()));
+    let audio_worklet_node = web_sys_utils::audio_worklet_node_with_options(&audio_context, "AudioTranslateProcessor", &audio_worklet_node_options);
     let message_port = audio_worklet_node.port().unwrap();
     let sample_rate = audio_context.sample_rate();
     let closure = Closure::wrap(Box::new(move |event: web_sys::MessageEvent| {
