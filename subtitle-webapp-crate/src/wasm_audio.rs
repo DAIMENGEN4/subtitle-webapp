@@ -1,4 +1,5 @@
 use crate::utils::{js_sys_utils, panic_utils, web_sys_utils};
+use std::collections::VecDeque;
 use wasm_bindgen::prelude::*;
 
 #[derive(serde::Serialize, serde::Deserialize)]
@@ -16,6 +17,34 @@ impl ProcessorOptions {
 #[wasm_bindgen]
 pub async fn start_realtime_translate(url: &str, vad_callback: js_sys::Function) {
     panic_utils::set_panic_hook();
+    let (tx, mut rx) = tokio::sync::mpsc::channel::<Vec<f32>>(32);
+    wasm_bindgen_futures::spawn_local(async move {
+        let min_speech_frames = 16;
+        let positive_speech_threshold = 0.75f64;
+        let mut audio_buffer = VecDeque::<(f64, Vec<f32>)>::new();
+        while let Some(audio_frame) = rx.recv().await {
+            // 预测当前音频帧是否包含语音活动
+            let js_value = vad_callback.call1(&JsValue::NULL, &JsValue::from(audio_frame.clone())).unwrap();
+            let promise = js_sys::Promise::from(js_value);
+            let speech_threshold = wasm_bindgen_futures::JsFuture::from(promise).await.unwrap();
+            let speech_threshold = speech_threshold.as_f64().unwrap();
+            // 将预测的结果和音频帧添加到队列中
+            audio_buffer.push_front((speech_threshold, audio_frame));
+            while audio_buffer.len() >= min_speech_frames && audio_buffer.iter().skip(audio_buffer.len() - min_speech_frames).filter(|(a, _)| *a < positive_speech_threshold).count() >= (min_speech_frames / 2) {
+                audio_buffer.pop_back();
+            }
+            // 如果队列中的音频帧超过一定数量，且新进的音频帧的语音活动阈值小于阈值，则发送音频数据，并重置缓存音频帧的队列
+            if audio_buffer.len() > min_speech_frames && is_monotonically_decreasing(audio_buffer.iter().take(min_speech_frames).map(|t| t.0).collect(), 5) {
+                let mut audio_data = Vec::<f32>::new();
+                while !audio_buffer.is_empty() {
+                    let samples = audio_buffer.pop_back().unwrap().1;
+                    audio_data.extend(samples);
+                }
+                web_sys::console::log_2(&"Send audio data length: ".into(), &audio_data.len().into());
+            }
+            web_sys::console::log_2(&"Audio buffer length: {}".into(), &audio_buffer.len().into());
+        }
+    });
     let audio_context = web_sys_utils::audio_context();
     let audio_worklet = audio_context.audio_worklet().unwrap();
     js_sys_utils::try_into_result(audio_worklet.add_module(url)).await;
@@ -39,12 +68,7 @@ pub async fn start_realtime_translate(url: &str, vad_callback: js_sys::Function)
             current_audio_gain = max_audio_gain.max(0.5f32 / max_amplitude);
         }
         let audio_frame = audio_frame.iter().map(|x| x * current_audio_gain).collect::<Vec<_>>();
-        let js_value = vad_callback.call1(&JsValue::NULL, &JsValue::from(audio_frame)).unwrap();
-        wasm_bindgen_futures::spawn_local(async move {
-            let promise = js_sys::Promise::from(js_value);
-            let result = wasm_bindgen_futures::JsFuture::from(promise).await.unwrap();
-            web_sys::console::log_1(&result);
-        });
+        tx.blocking_send(audio_frame).unwrap();
     }) as Box<dyn FnMut(_)>);
     message_port.set_onmessage(Some(closure.as_ref().unchecked_ref()));
     closure.forget();
@@ -57,7 +81,7 @@ pub async fn start_realtime_translate(url: &str, vad_callback: js_sys::Function)
         .unwrap();
 }
 
-pub async fn get_audio_device_stream() -> web_sys::MediaStream {
+async fn get_audio_device_stream() -> web_sys::MediaStream {
     let media_devices = web_sys_utils::media_devices();
     let constraints = web_sys_utils::media_stream_constraints();
     constraints.set_audio(&wasm_bindgen::JsValue::TRUE);
@@ -68,6 +92,15 @@ pub async fn get_audio_device_stream() -> web_sys::MediaStream {
         Ok(stream) => stream,
         Err(error) => panic!("Error: {:?}", error),
     }
+}
+
+fn is_monotonically_decreasing(input: Vec<f64>, audio_tolerance: usize) -> bool {
+    // let n = 3;
+    let n = audio_tolerance;
+    let sum: f64 = input.iter().skip(n).sum(); // 计算所有元素的总和
+    let avg: f64 = sum / (input.len() as f64 - n as f64); // 计算平均值
+    // 这里假设需要比较平均值是否大于0，具体逻辑可以根据需求调整
+    input[0..n].iter().all(|&x| x <= avg * 0.75f64)
 }
 
 // fn apply_bandpass_filter(audio: &mut [f32], sr: u32, low_freq: f32, high_freq: f32, gain: f32) {
