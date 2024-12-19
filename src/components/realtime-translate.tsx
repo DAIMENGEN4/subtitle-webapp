@@ -13,6 +13,8 @@ export const RealtimeTranslate = () => {
                     wasm.start_realtime_translate(href, async (data: Float32Array) => {
                         const speechProbabilities = await model.process(data);
                         return speechProbabilities.isSpeech;
+                    }, (data: Float32Array) => {
+                        log.debug("Send audio data length: ", data.length);
                     }).then(log.debug);
                 });
             }}>Start Translate Audio</Button>

@@ -15,7 +15,7 @@ impl ProcessorOptions {
 }
 
 #[wasm_bindgen]
-pub async fn start_realtime_translate(url: &str, vad_callback: js_sys::Function) {
+pub async fn start_realtime_translate(url: &str, vad_callback: js_sys::Function, send_callback: js_sys::Function) {
     panic_utils::set_panic_hook();
     let (tx, mut rx) = tokio::sync::mpsc::channel::<Vec<f32>>(32);
     wasm_bindgen_futures::spawn_local(async move {
@@ -40,7 +40,7 @@ pub async fn start_realtime_translate(url: &str, vad_callback: js_sys::Function)
                     let samples = audio_buffer.pop_back().unwrap().1;
                     audio_data.extend(samples);
                 }
-                web_sys::console::log_2(&"Send audio data length: ".into(), &audio_data.len().into());
+                send_callback.call1(&JsValue::NULL, &JsValue::from(audio_data)).unwrap();
             }
             web_sys::console::log_2(&"Audio buffer length: {}".into(), &audio_buffer.len().into());
         }
