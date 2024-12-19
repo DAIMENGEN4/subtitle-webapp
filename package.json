@@ -13,15 +13,16 @@
     "wasm-no-modules": "wasm-pack build ./subtitle-webapp-crate --target no-modules"
   },
   "dependencies": {
-    "@types/audioworklet": "^0.0.65",
     "antd": "^5.22.3",
     "onnxruntime-web": "^1.20.1",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "subtitle-webapp-crate": "file:./subtitle-webapp-crate/pkg"
+    "subtitle-webapp-crate": "file:./subtitle-webapp-crate/pkg",
+    "subtitle-webapp-grpc-web": "file:./proto"
   },
   "devDependencies": {
     "@eslint/js": "^9.15.0",
+    "@types/audioworklet": "^0.0.65",
     "@types/node": "^22.10.1",
     "@types/react": "^18.3.12",
     "@types/react-dom": "^18.3.1",
