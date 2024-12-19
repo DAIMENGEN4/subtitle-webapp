@@ -9,7 +9,7 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "update": "node scripts/update_script.js",
-    "wasm-web": "wasm-pack build ./subtitle-webapp-crate --target web",
+    "wasm-web": "wasm-pack build ./subtitle-webapp-crate --target web && yarn update",
     "wasm-no-modules": "wasm-pack build ./subtitle-webapp-crate --target no-modules"
   },
   "dependencies": {
