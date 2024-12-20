@@ -103,25 +103,6 @@ fn is_monotonically_decreasing(input: Vec<f64>, audio_tolerance: usize) -> bool 
     input[0..n].iter().all(|&x| x <= avg * 0.75f64)
 }
 
-// fn apply_bandpass_filter(audio: &mut [f32], sr: u32, low_freq: f32, high_freq: f32, gain: f32) {
-//     // 计算采样率的一半（奈奎斯特频率）
-//     let nyquist = sr as f32 / 2.0;
-//     let low_freq = (low_freq / nyquist).hz();
-//     let high_freq = (high_freq / nyquist).hz();
-//     // 创建带通滤波器的系数
-//     let cuffs = Coefficients::<f32>::from_params(
-//         Type::BandPass,
-//         high_freq,
-//         low_freq,
-//         std::f32::consts::FRAC_1_SQRT_2, // Q值（选择性）
-//     ).unwrap();
-//     let mut filter = DirectForm2Transposed::<f32>::new(cuffs);
-//     // 应用滤波器并增加增益
-//     for sample in audio.iter_mut() {
-//         *sample = filter.run(*sample) * gain;
-//     }
-// }
-
 // /// 创建一个用于处理 `web_sys::MessageEvent` 的闭包，并通过 `Closure::new` 封装返回。
 // ///
 // /// 1. 使用了较高级的 API `Closure::new`，内部会自动封装闭包并管理类型检查。
