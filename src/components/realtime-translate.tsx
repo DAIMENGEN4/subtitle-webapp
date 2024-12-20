@@ -7,11 +7,13 @@ import {ChatServiceClient} from "subtitle-webapp-grpc-web/ChatServiceClientPb";
 import {useMemo, useState} from "react";
 import * as AudioUtils from "@Root/utils/audio-utils.ts";
 import {hostname} from "@Root/host.ts";
+import {AudioEffect} from "@Root/components/audio-effect.tsx";
 
 export const RealtimeTranslate = () => {
     const options = null;
     const credentials = null;
     const chatServiceClient = useMemo(() => new ChatServiceClient(hostname, credentials, options), [options, credentials]);
+    const [volume, setVolume] = useState<number>(0);
     const [audioList, setAudioList] = useState<Array<string>>([]);
     return (
         <div>
@@ -21,6 +23,7 @@ export const RealtimeTranslate = () => {
                     const href = url.href;
                     wasm.start_realtime_translate(href, async (data: Float32Array) => {
                         const speechProbabilities = await model.process(data);
+                        setVolume(speechProbabilities.isSpeech);
                         return speechProbabilities.isSpeech;
                     }, (data: Float32Array) => {
                         const wavBuffer = AudioUtils.encodeWAV(data);
@@ -66,6 +69,10 @@ export const RealtimeTranslate = () => {
                         )
                     })}
                 </ol>
+            </div>
+
+            <div style={{width: "100%", textAlign: "center"}}>
+                <AudioEffect isSpeaking={volume > 0.1}/>
             </div>
         </div>
     );
