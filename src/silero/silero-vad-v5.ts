@@ -1,4 +1,4 @@
-import log from "@Root/logging";
+import log from "@R/log/logging.ts";
 import * as ort from "onnxruntime-web"
 
 export interface SpeechProbabilities {

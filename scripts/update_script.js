@@ -45,13 +45,16 @@ async function updateDependencies() {
     try {
         // 先删除依赖
         await removeDependencies(
-            ['subtitle-webapp-crate'], // 运行时依赖
+            ['subtitle-webapp-rust-crate', 'subtitle-webapp-grpc-web'], // 运行时依赖
             [] // 开发依赖
         );
         console.log('Old dependencies removed.');
         // 然后安装来自本地路径的依赖
         await installDependencies(
-            ['subtitle-webapp-crate@file:./subtitle-webapp-crate/pkg'], // 安装本地路径依赖
+            [
+                'subtitle-webapp-grpc-web@file:./proto',
+                'subtitle-webapp-rust-crate@file:./subtitle-webapp-rust-crate/pkg',
+            ], // 安装本地路径依赖
             [] // 安装开发依赖
         );
         console.log('New dependencies installed.');

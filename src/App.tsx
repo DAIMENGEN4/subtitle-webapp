@@ -1,5 +1,6 @@
-import "./App.css";
-import {RealtimeTranslate} from "@Root/components/realtime-translate.tsx";
+import "./App.scss"
+import {RealtimeTranslate} from "@R/components/realtime-translate/realtime-translate.tsx";
+
 function App() {
     return (
         <>
@@ -7,4 +8,5 @@ function App() {
         </>
     )
 }
+
 export default App

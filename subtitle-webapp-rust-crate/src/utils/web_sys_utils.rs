@@ -26,13 +26,13 @@ pub fn media_stream_constraints() -> web_sys::MediaStreamConstraints {
 }
 
 /// https://developer.mozilla.org/zh-CN/docs/Web/API/AudioWorkletNode
-pub fn audio_worklet_node(context: &web_sys::BaseAudioContext, name: &str) -> web_sys::AudioWorkletNode {
-    let result = web_sys::AudioWorkletNode::new(context, name);
-    match result {
-        Ok(node) => node,
-        Err(error) => panic!("Failed to create an AudioWorkletNode. {:?}", error),
-    }
-}
+// pub fn audio_worklet_node(context: &web_sys::BaseAudioContext, name: &str) -> web_sys::AudioWorkletNode {
+//     let result = web_sys::AudioWorkletNode::new(context, name);
+//     match result {
+//         Ok(node) => node,
+//         Err(error) => panic!("Failed to create an AudioWorkletNode. {:?}", error),
+//     }
+// }
 
 /// https://developer.mozilla.org/zh-CN/docs/Web/API/AudioWorkletNode
 pub fn audio_worklet_node_with_options(context: &web_sys::BaseAudioContext, name: &str, options: &web_sys::AudioWorkletNodeOptions) -> web_sys::AudioWorkletNode {

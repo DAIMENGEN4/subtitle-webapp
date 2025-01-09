@@ -15,9 +15,7 @@ export default defineConfig({
     },
     resolve: {
         alias: {
-            "@Root": "/src",
-            "@WebWorker": "/src/web-worker/workers",
-            "@AudioWorklet": "/src/audio-worklet/processors",
+            "@R": "/src",
         }
     },
     plugins: [
@@ -29,7 +27,7 @@ export default defineConfig({
     optimizeDeps: {
         exclude: [
             "onnxruntime-web",
-            "subtitle-webapp-crate"
+            "subtitle-webapp-rust-crate"
         ]
     }
 });

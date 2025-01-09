@@ -9,33 +9,36 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "update": "node scripts/update_script.js",
-    "wasm-web": "wasm-pack build ./subtitle-webapp-crate --target web && yarn update",
-    "wasm-no-modules": "wasm-pack build ./subtitle-webapp-crate --target no-modules"
+    "grpc-web": "./protoc-3.20.0-win64/bin/protoc --proto_path=./proto chat.proto --js_out=import_style=commonjs:./proto --grpc-web_out=import_style=typescript,mode=grpcwebtext:./proto",
+    "wasm-web": "wasm-pack build ./subtitle-webapp-rust-crate --target web && yarn update",
+    "wasm-no-modules": "wasm-pack build ./subtitle-webapp-rust-crate --target no-modules"
   },
   "dependencies": {
-    "antd": "^5.22.3",
+    "antd": "^5.22.6",
     "onnxruntime-web": "^1.20.1",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "subtitle-webapp-crate": "file:./subtitle-webapp-crate/pkg",
-    "subtitle-webapp-grpc-web": "file:./proto"
+    "subtitle-webapp-grpc-web": "file:./proto",
+    "subtitle-webapp-rust-crate": "file:./subtitle-webapp-rust-crate/pkg"
   },
   "devDependencies": {
-    "@eslint/js": "^9.15.0",
+    "@eslint/js": "^9.17.0",
     "@types/audioworklet": "^0.0.65",
-    "@types/node": "^22.10.1",
-    "@types/react": "^18.3.12",
-    "@types/react-dom": "^18.3.1",
+    "@types/node": "^22.10.2",
+    "@types/react": "^18.3.18",
+    "@types/react-dom": "^18.3.5",
     "@vitejs/plugin-react": "^4.3.4",
-    "eslint": "^9.15.0",
+    "eslint": "^9.17.0",
     "eslint-plugin-react-hooks": "^5.0.0",
-    "eslint-plugin-react-refresh": "^0.4.14",
-    "globals": "^15.12.0",
+    "eslint-plugin-react-refresh": "^0.4.16",
+    "globals": "^15.14.0",
+    "sass": "^1.83.0",
+    "sass-loader": "^16.0.4",
     "typescript": "~5.6.2",
-    "typescript-eslint": "^8.15.0",
-    "vite": "^6.0.1",
+    "typescript-eslint": "^8.18.2",
+    "vite": "^6.0.5",
     "vite-plugin-mkcert": "^1.17.6",
     "vite-plugin-top-level-await": "^1.4.4",
-    "vite-plugin-wasm": "^3.3.0"
+    "vite-plugin-wasm": "^3.4.1"
   }
 }
