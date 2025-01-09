@@ -1,50 +1,45 @@
-# React + TypeScript + Vite
+# SubtitleWebapp 项目说明
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+本项目使用 TypeScript 和 Rust WebAssembly 的开发。以下是项目中常用的命令及其功能。
 
-Currently, two official plugins are available:
+## 脚本命令
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+### 启动项目
 
-## Expanding the ESLint configuration
+- **`yarn start`**: 启动网站，用于本地开发。
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
+### 构建项目
 
-- Configure the top-level `parserOptions` property like this:
+- **`yarn build`**: 构建生产版本。
 
-```js
-export default tseslint.config({
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
-```
+### 代码检查
 
-- Replace `tseslint.configs.recommended` to `tseslint.configs.recommendedTypeChecked` or `tseslint.configs.strictTypeChecked`
-- Optionally add `...tseslint.configs.stylisticTypeChecked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and update the config:
+- **`yarn lint`**: 运行 ESLint 检查代码规范。  
+  **命令**: `eslint .`  
+  **说明**: 检查项目中的 JavaScript 和 TypeScript 代码是否符合规范。
 
-```js
-// eslint.config.js
-import react from 'eslint-plugin-react'
+### 预览项目
 
-export default tseslint.config({
-  // Set the react version
-  settings: { react: { version: '18.3' } },
-  plugins: {
-    // Add the react plugin
-    react,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended rules
-    ...react.configs.recommended.rules,
-    ...react.configs['jsx-runtime'].rules,
-  },
-})
-```
+- **`yarn preview`**: 运行生产版本预览模式。  
+  **命令**: `vite preview`  
+  **说明**: 构建完后，启动预览服务器查看生产版本。
+
+### gRPC-Web 生成代码
+
+- **`yarn grpc-web`**: 使用 `protoc` 工具生成 gRPC-Web 客户端代码。  
+  **命令**: `./protoc-3.20.0-win64/bin/protoc --proto_path=./proto chat.proto --js_out=import_style=commonjs:./proto --grpc-web_out=import_style=typescript,mode=grpcwebtext:./proto`  
+  **说明**: 编译 `.proto` 文件并生成 TypeScript 客户端代码以供 gRPC-Web 使用。
+
+### 构建 WebAssembly (Wasm) 模块
+
+- **`yarn wasm-web`**: 构建 WebAssembly 模块并生成 web 目标的代码。  
+  **命令**: `wasm-pack build ./subtitle-webapp-rust-crate --target web && yarn update`  
+  **说明**: 使用 `wasm-pack` 构建 Rust WebAssembly 模块，并通过 `yarn update` 更新相关依赖。
+
+- **`wasm-no-modules`**: 构建 WebAssembly 模块，生成没有模块化支持的代码。  
+  **命令**: `wasm-pack build ./subtitle-webapp-rust-crate --target no-modules`  
+  **说明**: 构建不支持模块化的 WebAssembly 代码，适用于某些不支持模块的环境。
+
+---
+
+以上是项目中常用命令的介绍，执行这些命令可以帮助你进行开发、构建、更新和调试。
