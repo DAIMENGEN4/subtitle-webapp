@@ -130,10 +130,9 @@ async fn get_audio_device_stream() -> web_sys::MediaStream {
     let result = media_devices.get_user_media_with_constraints(&constraints);
     let value = js_sys_utils::try_into_result(result).await;
     let result = value.dyn_into::<web_sys::MediaStream>();
-    match result {
-        Ok(stream) => stream,
-        Err(error) => panic!("Error: {:?}", error),
-    }
+    result.unwrap_or_else(|error| {
+        panic!("Error: {:?}", error);
+    })
 }
 
 fn is_monotonically_decreasing(input: Vec<f64>, audio_tolerance: usize) -> bool {
