@@ -21,7 +21,7 @@ pub async fn start_realtime_translate(
     url: &str,
     vad_callback: js_sys::Function,
     send_callback: js_sys::Function,
-) -> Result<(), String> {
+) -> Result<JsValue, String> {
     panic_utils::set_panic_hook();
     let (tx, mut rx) = tokio::sync::mpsc::channel::<Vec<f32>>(32);
     wasm_bindgen_futures::spawn_local(async move {
@@ -68,10 +68,10 @@ pub async fn start_realtime_translate(
                     .call1(&JsValue::NULL, &JsValue::from(audio_data))
                     .unwrap();
             }
-            web_sys::console::log_2(
-                &"Audio buffer length: {}".into(),
-                &audio_buffer.len().into(),
-            );
+            // web_sys::console::log_2(
+            //     &"Audio buffer length: {}".into(),
+            //     &audio_buffer.len().into(),
+            // );
         }
     });
     let audio_context = web_sys_utils::audio_context();
@@ -109,6 +109,7 @@ pub async fn start_realtime_translate(
             .iter()
             .map(|x| x * current_audio_gain)
             .collect::<Vec<_>>();
+        // web_sys::console::log_1(&"send".into());
         tx.blocking_send(audio_frame).unwrap();
     }) as Box<dyn FnMut(_)>);
     message_port.set_onmessage(Some(closure.as_ref().unchecked_ref()));
@@ -120,7 +121,7 @@ pub async fn start_realtime_translate(
     audio_worklet_node
         .connect_with_audio_node(&destination_node)
         .unwrap();
-    Ok(())
+    Ok(JsValue::from(audio_context))
 }
 
 async fn get_audio_device_stream() -> web_sys::MediaStream {

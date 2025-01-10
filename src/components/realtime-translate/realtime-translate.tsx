@@ -1,54 +1,17 @@
-import React, { useState, useEffect, useRef } from "react";
-import { Button } from "antd";
+import React, {useState} from "react";
+import {Button} from "antd";
 import log from "@R/log/logging.ts";
 import * as wasm from "subtitle-webapp-rust-crate";
-import { ChatRequest } from "subtitle-webapp-grpc-web";
+import {ChatRequest} from "subtitle-webapp-grpc-web";
 import * as AudioUtils from "@R/utils/audio-utils.ts";
-import { SileroVadV5 } from "@R/silero/silero-vad-v5.ts";
-import { useChatServiceClient } from "@R/hooks/use-chat-service-client.tsx";
+import {SileroVadV5} from "@R/silero/silero-vad-v5.ts";
+import {useChatServiceClient} from "@R/hooks/use-chat-service-client.tsx";
 
 export const RealtimeTranslate = () => {
     const [volume, setVolume] = useState<number>(0);
     const [audioList, setAudioList] = useState<Array<string>>([]);
-    const [volumeHistory, setVolumeHistory] = useState<Array<number>>([]);
+    const [audioContext, setAudioContext] = useState<AudioContext | undefined>();
     const chatServiceClient = useChatServiceClient();
-
-    const canvasRef = useRef<HTMLCanvasElement | null>(null);
-    const containerRef = useRef<HTMLDivElement | null>(null);
-
-    // Update volume history to track changes
-    useEffect(() => {
-        if (volumeHistory.length > 50) {
-            setVolumeHistory((prevHistory) => prevHistory.slice(1));
-        }
-        setVolumeHistory((prevHistory) => [...prevHistory, volume]);
-
-        if (canvasRef.current && containerRef.current) {
-            const ctx = canvasRef.current.getContext("2d");
-            if (ctx) {
-                const width = containerRef.current.offsetWidth;
-                const height = 150;
-                // Update the internal resolution of the canvas for crisp rendering
-                canvasRef.current.width = width * window.devicePixelRatio;  // Set the internal width
-                canvasRef.current.height = height * window.devicePixelRatio; // Set the internal height
-
-                // Scale the drawing context for high DPI screens
-                ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
-
-                ctx.clearRect(0, 0, width, height); // Clear the canvas
-                ctx.beginPath();
-                ctx.moveTo(0, height - volumeHistory[0] * height); // Start point
-                volumeHistory.forEach((vol, index) => {
-                    const x = (index / volumeHistory.length) * width;
-                    const y = height - vol * height;
-                    ctx.lineTo(x, y);
-                });
-                ctx.strokeStyle = volume > 0.5 ? 'green' : volume > 0 ? 'orange' : 'red';
-                ctx.lineWidth = 2;
-                ctx.stroke();
-            }
-        }
-    }, [volume, volumeHistory]);
 
     return (
         <div style={{
@@ -109,36 +72,43 @@ export const RealtimeTranslate = () => {
             <Button
                 type="primary"
                 onClick={() => {
-                    SileroVadV5.new().then(model => {
-                        const url = new URL("@R/processors/audio-translate-processor.ts", import.meta.url);
-                        const href = url.href;
-                        wasm.start_realtime_translate(href, async (data: Float32Array) => {
-                            const speechProbabilities = await model.process(data);
-                            setVolume(speechProbabilities.isSpeech);
-                            return speechProbabilities.isSpeech;
-                        }, (data: Float32Array) => {
-                            const wavBuffer = AudioUtils.encodeWAV(data);
-                            const wavBob = new Blob([wavBuffer], { type: "audio/wav" });
-                            const url = URL.createObjectURL(wavBob);
-                            setAudioList(old => [url, ...old]);
-                        }).then(log.debug);
-                    });
+                    if (!audioContext) {
+                        SileroVadV5.new().then(model => {
+                            const url = new URL("@R/processors/audio-translate-processor.ts", import.meta.url);
+                            const href = url.href;
+                            wasm.start_realtime_translate(href, async (data: Float32Array) => {
+                                const speechProbabilities = await model.process(data);
+                                setVolume(speechProbabilities.isSpeech);
+                                return speechProbabilities.isSpeech;
+                            }, (data: Float32Array) => {
+                                const wavBuffer = AudioUtils.encodeWAV(data);
+                                const wavBob = new Blob([wavBuffer], {type: "audio/wav"});
+                                const url = URL.createObjectURL(wavBob);
+                                setAudioList(old => [url, ...old]);
+                            }).then(setAudioContext).catch(log.error);
+                        });
+                    } else {
+                        audioContext.close().then(() => setAudioContext(undefined));
+                    }
                 }}
                 style={{
                     padding: '12px 25px',
                     fontSize: '18px',
                     borderRadius: '8px',
                     width: '80%',
+                    height: '50px',
                     marginBottom: '20px',
                     backgroundColor: '#91003c',
                     border: 'none',
                 }}
             >
-                开始录制
+                {
+                    audioContext ? "Stop Recording" : "Start Recording"
+                }
             </Button>
 
             {/* Container for Progress Bar and Canvas */}
-            <div ref={containerRef} style={{
+            <div style={{
                 width: '80%',
                 display: 'flex',
                 flexDirection: 'column',
@@ -162,18 +132,6 @@ export const RealtimeTranslate = () => {
                         transition: 'width 0.3s ease',
                     }}></div>
                 </div>
-
-                {/* Line Chart for Volume Over Time (Native Canvas) */}
-                <canvas
-                    ref={canvasRef}
-                    width={500} // This is the internal resolution, not the display size
-                    height={150} // Internal resolution
-                    style={{
-                        width: '100%', // This is the display size
-                        border: '1px solid #ddd',
-                        borderRadius: '8px',
-                    }}
-                />
             </div>
 
             {/* Volume Display */}
@@ -187,8 +145,8 @@ export const RealtimeTranslate = () => {
             </div>
 
             {/* Audio Playlist Section */}
-            <div style={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                <h3 style={{ marginBottom: '15px' }}>录音列表</h3>
+            <div style={{width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center'}}>
+                <h3 style={{marginBottom: '15px'}}>录音列表</h3>
                 <ol id="playlist" style={{
                     listStyleType: 'none',
                     padding: '0',
@@ -210,7 +168,7 @@ export const RealtimeTranslate = () => {
                                 maxWidth: '500px',
                                 borderRadius: '8px',
                                 boxShadow: '0 2px 10px rgba(0, 0, 0, 0.1)',
-                            }} />
+                            }}/>
                         </li>
                     ))}
                 </ol>
