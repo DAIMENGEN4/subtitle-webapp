@@ -1,9 +1,11 @@
 import {persistReducer, persistStore} from "redux-persist";
 import {combineReducers, configureStore} from "@reduxjs/toolkit";
+import staticReducer from "@R/store/features/static-slice";
 import sessionReducer from "@R/store/features/session-slice";
-import {persistConfig, sessionPersistConfig} from "@R/store/config";
+import {persistConfig, sessionPersistConfig, staticPersistConfig} from "@R/store/config";
 
 const reducers = combineReducers({
+    static: persistReducer(staticPersistConfig, staticReducer),
     session: persistReducer(sessionPersistConfig, sessionReducer),
 })
 

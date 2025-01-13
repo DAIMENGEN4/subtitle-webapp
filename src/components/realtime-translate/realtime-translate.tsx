@@ -10,6 +10,7 @@ import * as wasm from "subtitle-webapp-rust-crate";
 import * as AudioUtils from "@R/utils/audio-utils.ts";
 import {ChatRequest} from "subtitle-webapp-grpc-web";
 import log from "@R/log/logging.ts";
+import {SubtitleAssistBall} from "@R/components/realtime-translate/subtitle-assist-ball.tsx";
 
 export const RealtimeTranslate = () => {
     const [volume, setVolume] = useState<number>(0);
@@ -17,6 +18,7 @@ export const RealtimeTranslate = () => {
     const {subtitleInfos, listenSubtitleInfos} = useChatListen();
     const [audioContext, setAudioContext] = useState<AudioContext | undefined>();
     const subtitleContentRef = useRef<HTMLDivElement>(null);
+    const realtimeTranslateContainer = useRef<HTMLDivElement>(null);
     const startRecording = useCallback(async () => {
         if (!audioContext) {
             SileroVadV5.new().then(model => {
@@ -63,7 +65,7 @@ export const RealtimeTranslate = () => {
     }, [listenSubtitleInfos]);
 
     return (
-        <div className={"realtime-translate-container"}>
+        <div ref={realtimeTranslateContainer} className={"realtime-translate-container"}>
             <div ref={subtitleContentRef} className={"subtitle-content"}>
                 <ConfigProvider theme={{algorithm: theme.darkAlgorithm}}>
                     <Flex vertical>
@@ -74,14 +76,14 @@ export const RealtimeTranslate = () => {
                     </Flex>
                 </ConfigProvider>
             </div>
-            <div className={"subtitle-settings"}>
+            <div className={"audio-record-button-container"}>
                 <div className={"volume-bar-visualization"}>
                     <div className={"volume-bar"} style={{
                         width: `${volume * 100}%`,
                         backgroundColor: volume > 0.5 ? '#4d7668' : volume > 0 ? '#4d7668' : '#D1495B',
                     }}></div>
                 </div>
-                <div className={"subtitle-settings-content"}>
+                <div className={"audio-record-button"}>
                     <Button style={{
                         "--background-color": "transparent",
                         "--border-style": "none",
@@ -89,6 +91,7 @@ export const RealtimeTranslate = () => {
                     }} onClick={startRecording}>{audioContext ? "Stop Recording" : "Start Recording"}</Button>
                 </div>
             </div>
+            <SubtitleAssistBall parent={realtimeTranslateContainer}/>
         </div>
     )
 }

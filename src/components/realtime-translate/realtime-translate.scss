@@ -7,7 +7,7 @@
     overflow: auto;
   }
 
-  .subtitle-settings {
+  .audio-record-button-container {
     height: 10vh;
     padding: 10px;
     position: relative;
@@ -27,7 +27,7 @@
       }
     }
 
-    .subtitle-settings-content {
+    .audio-record-button {
       height: calc(10vh - 20px);
       font-size: 18px;
       border-radius: 8px;
