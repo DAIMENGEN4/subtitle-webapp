@@ -6,7 +6,7 @@ import topLevelAwait from "vite-plugin-top-level-await";
 
 export default defineConfig({
     server: {
-        host: "127.0.0.1",
+        host: "10.150.115.16",
         port: 3000,
         headers: {
             "Cross-Origin-Opener-Policy": "same-origin",

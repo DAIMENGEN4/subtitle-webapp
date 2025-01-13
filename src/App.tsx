@@ -1,11 +1,12 @@
 import "./App.scss"
-import {RealtimeTranslate} from "@R/components/realtime-translate/realtime-translate.tsx";
+import {BrowserRouter} from "react-router-dom";
+import {WebappRoute} from "@R/route/webapp-route.tsx";
 
 function App() {
     return (
-        <>
-            <RealtimeTranslate/>
-        </>
+        <BrowserRouter>
+            <WebappRoute/>
+        </BrowserRouter>
     )
 }
 
