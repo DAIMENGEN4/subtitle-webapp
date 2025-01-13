@@ -78,7 +78,7 @@ export const RealtimeTranslate = () => {
                 <div className={"volume-bar-visualization"}>
                     <div className={"volume-bar"} style={{
                         width: `${volume * 100}%`,
-                        backgroundColor: volume > 0.5 ? '#6BA292' : volume > 0 ? '#E8C547' : '#D1495B',
+                        backgroundColor: volume > 0.5 ? '#4d7668' : volume > 0 ? '#4d7668' : '#D1495B',
                     }}></div>
                 </div>
                 <div className={"subtitle-settings-content"}>
