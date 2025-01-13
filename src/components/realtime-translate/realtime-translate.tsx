@@ -1,147 +1,94 @@
-import {useState} from "react";
-import {Button} from "antd";
-import log from "@R/log/logging.ts";
-import * as wasm from "subtitle-webapp-rust-crate";
-import {ChatRequest} from "subtitle-webapp-grpc-web";
-import * as AudioUtils from "@R/utils/audio-utils.ts";
-import {SileroVadV5} from "@R/silero/silero-vad-v5.ts";
+import "./realtime-translate.scss";
+import {Button} from "antd-mobile";
+import {useCallback, useEffect, useRef, useState} from "react";
+import {ConfigProvider, Flex, theme} from "antd";
+import {SubtitleItem} from "@R/components/realtime-translate/subtitle-item.tsx";
+import {useChatListen} from "@R/components/realtime-translate/hooks/use-chat-listen.tsx";
 import {useChatServiceClient} from "@R/components/realtime-translate/hooks/use-chat-service-client.tsx";
+import {SileroVadV5} from "@R/silero/silero-vad-v5.ts";
+import * as wasm from "subtitle-webapp-rust-crate";
+import * as AudioUtils from "@R/utils/audio-utils.ts";
+import {ChatRequest} from "subtitle-webapp-grpc-web";
+import log from "@R/log/logging.ts";
 
 export const RealtimeTranslate = () => {
     const [volume, setVolume] = useState<number>(0);
-    const [audioList, setAudioList] = useState<Array<string>>([]);
     const chatServiceClient = useChatServiceClient();
+    const {subtitleInfos, listenSubtitleInfos} = useChatListen();
     const [audioContext, setAudioContext] = useState<AudioContext | undefined>();
+    const subtitleContentRef = useRef<HTMLDivElement>(null);
+    const startRecording = useCallback(async () => {
+        if (!audioContext) {
+            SileroVadV5.new().then(model => {
+                const url = new URL("@R/processors/audio-translate-processor.ts", import.meta.url);
+                const href = url.href;
+                wasm.start_realtime_translate(href, async (data: Float32Array) => {
+                    const speechProbabilities = await model.process(data);
+                    setVolume(speechProbabilities.isSpeech);
+                    return speechProbabilities.isSpeech;
+                }, (data: Float32Array) => {
+                    const wavBuffer = AudioUtils.encodeWAV(data);
+                    const request = new ChatRequest();
+                    request.setMeetingRoom("wasm");
+                    request.setSpeaker("wasm-speaker");
+                    request.setStart(Math.floor(new Date().getTime() / 1000));
+                    request.setEnd(0);
+                    request.setSampleRate(16000);
+                    request.setAudioBytes(new Uint8Array(wavBuffer));
+                    request.setTargetLanguageList(["cmn", "eng", "jpn"]);
+                    request.setTag(new Date().toISOString());
+                    request.setTag64(1);
+                    chatServiceClient.chatSend(request, {}).then(() => {
+                        log.debug("Send audio data...");
+                    });
+                }).then(setAudioContext).catch(log.error);
+            });
+        } else {
+            audioContext.close().then(() => setAudioContext(undefined));
+        }
+    }, [audioContext, chatServiceClient]);
+
+    useEffect(() => {
+        const container = subtitleContentRef.current;
+        if (container) {
+            requestAnimationFrame(() => {
+                container.scrollTop = container.scrollHeight;
+            });
+        }
+    }, [subtitleInfos]);
+
+    useEffect(() => {
+        const stream = listenSubtitleInfos("wasm");
+        return () => stream.cancel();
+    }, [listenSubtitleInfos]);
 
     return (
-        <div style={{
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            justifyContent: 'center',
-            height: '100vh',
-            padding: '20px',
-            backgroundColor: '#f7f7f7',
-            fontFamily: 'Arial, sans-serif'
-        }}>
-            {/* Start Recording Button */}
-            <Button
-                type="primary"
-                onClick={() => {
-                    if (!audioContext) {
-                        SileroVadV5.new().then(model => {
-                            const url = new URL("@R/processors/audio-translate-processor.ts", import.meta.url);
-                            const href = url.href;
-                            wasm.start_realtime_translate(href, async (data: Float32Array) => {
-                                const speechProbabilities = await model.process(data);
-                                setVolume(speechProbabilities.isSpeech);
-                                return speechProbabilities.isSpeech;
-                            }, (data: Float32Array) => {
-                                const wavBuffer = AudioUtils.encodeWAV(data);
-                                const wavBob = new Blob([wavBuffer], {type: "audio/wav"});
-                                const url = URL.createObjectURL(wavBob);
-                                setAudioList(old => [url, ...old]);
-                                const request = new ChatRequest();
-                                request.setMeetingRoom("wasm");
-                                request.setSpeaker("wasm-speaker");
-                                request.setStart(Math.floor(new Date().getTime() / 1000));
-                                request.setEnd(0);
-                                request.setSampleRate(16000);
-                                request.setAudioBytes(new Uint8Array(wavBuffer));
-                                request.setTargetLanguageList(["cmn", "eng", "jpn"]);
-                                request.setTag(new Date().toISOString());
-                                request.setTag64(1);
-                                chatServiceClient.chatSend(request, {}).then(() => {
-                                    log.debug("Send audio data...");
-                                });
-                            }).then(setAudioContext).catch(log.error);
-                        });
-                    } else {
-                        audioContext.close().then(() => setAudioContext(undefined));
-                    }
-                }}
-                style={{
-                    padding: '12px 25px',
-                    fontSize: '18px',
-                    borderRadius: '8px',
-                    width: '80%',
-                    height: '50px',
-                    marginBottom: '20px',
-                    backgroundColor: '#91003c',
-                    border: 'none',
-                }}
-            >
-                {
-                    audioContext ? "Stop Recording" : "Start Recording"
-                }
-            </Button>
-
-            {/* Container for Progress Bar and Canvas */}
-            <div style={{
-                width: '80%',
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                marginBottom: '20px',
-            }}>
-
-                {/* Volume Bar Visualization */}
-                <div style={{
-                    width: '100%',
-                    backgroundColor: '#ddd',
-                    height: '10px',
-                    borderRadius: '5px',
-                    overflow: 'hidden',
-                    marginBottom: '20px',
-                }}>
-                    <div style={{
+        <div className={"realtime-translate-container"}>
+            <div ref={subtitleContentRef} className={"subtitle-content"}>
+                <ConfigProvider theme={{algorithm: theme.darkAlgorithm}}>
+                    <Flex vertical>
+                        {
+                            subtitleInfos.map((subtitleInfo, index) => <SubtitleItem key={index}
+                                                                                     subtitleInfo={subtitleInfo}/>)
+                        }
+                    </Flex>
+                </ConfigProvider>
+            </div>
+            <div className={"subtitle-settings"}>
+                <div className={"volume-bar-visualization"}>
+                    <div className={"volume-bar"} style={{
                         width: `${volume * 100}%`,
-                        height: '100%',
-                        backgroundColor: volume > 0.5 ? 'green' : volume > 0 ? 'orange' : 'red',
-                        transition: 'width 0.3s ease',
+                        backgroundColor: volume > 0.5 ? '#6BA292' : volume > 0 ? '#E8C547' : '#D1495B',
                     }}></div>
                 </div>
-            </div>
-
-            {/* Volume Display */}
-            <div style={{
-                marginBottom: '20px',
-                fontSize: '18px',
-                fontWeight: 'bold',
-                color: volume > 0.5 ? 'green' : volume > 0 ? 'orange' : 'red'
-            }}>
-                音量: {volume}
-            </div>
-
-            {/* Audio Playlist Section */}
-            <div style={{width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center'}}>
-                <h3 style={{marginBottom: '15px'}}>录音列表</h3>
-                <ol id="playlist" style={{
-                    listStyleType: 'none',
-                    padding: '0',
-                    margin: '0',
-                    width: '80%',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center',
-                }}>
-                    {audioList.map(audioURL => (
-                        <li key={audioURL.substring(-10)} style={{
-                            width: '100%',
-                            marginBottom: '15px',
-                            display: 'flex',
-                            justifyContent: 'center',
-                        }}>
-                            <audio controls src={audioURL} style={{
-                                width: '100%',
-                                maxWidth: '500px',
-                                borderRadius: '8px',
-                                boxShadow: '0 2px 10px rgba(0, 0, 0, 0.1)',
-                            }}/>
-                        </li>
-                    ))}
-                </ol>
+                <div className={"subtitle-settings-content"}>
+                    <Button style={{
+                        "--background-color": "transparent",
+                        "--border-style": "none",
+                        "--text-color": "rgba(255, 255, 255, 1)"
+                    }} onClick={startRecording}>{audioContext ? "Stop Recording" : "Start Recording"}</Button>
+                </div>
             </div>
         </div>
-    );
-};
+    )
+}

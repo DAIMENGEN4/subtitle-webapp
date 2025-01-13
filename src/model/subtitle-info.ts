@@ -5,7 +5,7 @@ import {Language} from "@R/contants/language.ts";
 
 dayjs.extend(utc)
 
-export class Subtitle {
+export class SubtitleInfo {
     public readonly time: string;
     public readonly speaker: string;
     public readonly chinese: string;

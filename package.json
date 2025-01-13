@@ -14,6 +14,7 @@
     "wasm-no-modules": "wasm-pack build ./subtitle-webapp-rust-crate --target no-modules"
   },
   "dependencies": {
+    "@ant-design/x": "^1.0.4",
     "@react-native-async-storage/async-storage": "^2.1.0",
     "@reduxjs/toolkit": "^2.5.0",
     "antd": "^5.22.6",

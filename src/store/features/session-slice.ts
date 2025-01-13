@@ -1,17 +1,17 @@
 import {createSlice, PayloadAction} from "@reduxjs/toolkit";
-import {Subtitle} from "@R/model/subtitle.ts";
+import {SubtitleInfo} from "@R/model/subtitle-info.ts";
 
 // Ensure the array has at most 100 items
 const maxSubtitles = 50;
 
 export type SessionStore = {
     roomId?: string;
-    subtitles: Array<Subtitle>;
+    subtitleInfos: Array<SubtitleInfo>;
 }
 
 const initialState: SessionStore = {
     roomId: undefined,
-    subtitles: []
+    subtitleInfos: []
 };
 
 const sessionSlice = createSlice({
@@ -21,21 +21,21 @@ const sessionSlice = createSlice({
         setRoomId(state, action: PayloadAction<string | undefined>) {
             state.roomId = action.payload;
         },
-        addSubtitle(state, action: PayloadAction<Subtitle>) {
-            state.subtitles.push(action.payload);
-            if (state.subtitles.length > maxSubtitles) {
-                state.subtitles.shift();
+        addSubtitleInfo(state, action: PayloadAction<SubtitleInfo>) {
+            state.subtitleInfos.push(action.payload);
+            if (state.subtitleInfos.length > maxSubtitles) {
+                state.subtitleInfos.shift();
             }
         },
-        clearSubtitles(state) {
-            state.subtitles = [];
+        clearSubtitleInfos(state) {
+            state.subtitleInfos = [];
         }
     }
 });
 
 export const {
     setRoomId,
-    addSubtitle,
-    clearSubtitles
+    addSubtitleInfo,
+    clearSubtitleInfos
 } = sessionSlice.actions;
 export default sessionSlice.reducer;
