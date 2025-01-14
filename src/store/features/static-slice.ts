@@ -9,8 +9,8 @@ export type StaticStore = {
 }
 
 const initialState: StaticStore = {
-    fontSize: 22,
-    displayLayout: [SubtitleLayout.TIME, SubtitleLayout.SPEAKER, SubtitleLayout.SUBTITLE],
+    fontSize: 16,
+    displayLayout: [SubtitleLayout.TIME, SubtitleLayout.SPEAKER, SubtitleLayout.ROOM],
     displayLanguage: [Language.CHINESE, Language.ENGLISH, Language.JAPANESE],
 }
 

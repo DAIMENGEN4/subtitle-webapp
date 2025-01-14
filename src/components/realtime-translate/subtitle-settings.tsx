@@ -108,8 +108,8 @@ export const SubtitleSettings = () => {
                     <CheckList multiple={true} defaultValue={displayLayout}
                                onChange={(value) => webappDispatch(setDisplayLayout(value as Array<string>))}>
                         <CheckList.Item value={"time"}>Time</CheckList.Item>
+                        <CheckList.Item value={"room"}>Room</CheckList.Item>
                         <CheckList.Item value={"speaker"}>Speaker</CheckList.Item>
-                        <CheckList.Item value={"subtitle"}>Subtitle</CheckList.Item>
                     </CheckList>
                 </DisplayBlock>
             </Popup>
