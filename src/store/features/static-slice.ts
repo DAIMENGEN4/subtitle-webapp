@@ -10,8 +10,8 @@ export type StaticStore = {
 
 const initialState: StaticStore = {
     fontSize: 16,
-    displayLayout: [SubtitleLayout.TIME, SubtitleLayout.SPEAKER, SubtitleLayout.ROOM],
-    displayLanguage: [Language.CHINESE, Language.ENGLISH, Language.JAPANESE],
+    displayLayout: [SubtitleLayout.TIME],
+    displayLanguage: [Language.ENGLISH],
 }
 
 const staticSlice = createSlice({
