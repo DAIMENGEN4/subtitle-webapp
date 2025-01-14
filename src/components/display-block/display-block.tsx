@@ -1,5 +1,4 @@
 import "./display-block.scss";
-import React from "react"
 import type {FC, ReactNode} from "react"
 
 interface Props {
