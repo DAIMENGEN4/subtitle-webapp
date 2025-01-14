@@ -3,31 +3,35 @@ import {Button, Card, CheckList, Grid, Image, Modal, Popup, Slider, Space} from 
 import bubble_webp from "@R/assets/jpeg/bubble.jpeg";
 import {useWebappDispatch, useWebappSelector} from "@R/store/webapp-hook.ts";
 import {SwitchRoomIcon01} from "@R/assets/svg/switch-room-icon-01.tsx";
-import {setRoomId} from "@R/store/features/session-slice.ts";
+import {changeLargeLanguageModel, setRoomId} from "@R/store/features/session-slice.ts";
 import {FontSizeIcon01} from "@R/assets/svg/font-size-icon-01.tsx";
 import {LayoutIcon01} from "@R/assets/svg/layout-icon-01.tsx";
 import {LanguageIcon01} from "@R/assets/svg/language-icon-01.tsx";
 import {DisplayBlock} from "@R/components/display-block/display-block.tsx";
 import {setDisplayLanguage, setDisplayLayout, setFontSize} from "@R/store/features/static-slice.ts";
 import {Language} from "@R/contants/language.ts";
+import {LargeModelIcon01} from "@R/assets/svg/large-model-icon-01.tsx";
+import {LargeLanguageModel} from "@R/contants/large-language-model.ts";
 
 export const SubtitleSettings = () => {
-    const webappDispatch = useWebappDispatch();
     const container = document.getElementById("root");
     const [isAdjustingSetting, setIsAdjustingSetting] = useState(false);
     const [isAdjustingFontSize, setIsAdjustingFontSize] = useState(false);
     const [isAdjustingLanguage, setIsAdjustingLanguage] = useState(false);
+    const webappDispatch = useWebappDispatch();
     const [isAdjustingDisplayLayout, setIsAdjustingDisplayLayout] = useState(false);
+    const [isAdjustingLargeLanguageModel, setIsAdjustingLargeLanguageModel] = useState(false);
     const roomId = useWebappSelector(state => state.session.roomId);
     const fontSize = useWebappSelector(state => state.static.fontSize);
     const displayLayout = useWebappSelector(state => state.static.displayLayout);
     const displayLanguage = useWebappSelector(state => state.static.displayLanguage);
+    const largeLanguageModel = useWebappSelector(state => state.session.largeLanguageModel);
 
     return (
         <div className={"subtitle-settings"}>
             <Image src={bubble_webp} onClick={() => setIsAdjustingSetting(true)}/>
             <Modal
-                visible={isAdjustingSetting && !isAdjustingDisplayLayout && !isAdjustingFontSize && !isAdjustingLanguage}
+                visible={isAdjustingSetting && !isAdjustingDisplayLayout && !isAdjustingFontSize && !isAdjustingLanguage && !isAdjustingLargeLanguageModel}
                 destroyOnClose={true}
                 closeOnMaskClick={true}
                 getContainer={container}
@@ -37,7 +41,7 @@ export const SubtitleSettings = () => {
                     <div className={"subtitle-setting-modal"}>
                         <Card title={`Room: ${roomId}`} headerStyle={{display: "flex", justifyContent: "center"}}>
                             <Grid columns={2}>
-                                <Grid.Item>
+                                <Grid.Item span={2}>
                                     <Space direction={"vertical"} style={{textAlign: "center", width: "100%"}}>
                                         <Button onClick={() => {
                                             setIsAdjustingSetting(false);
@@ -71,6 +75,15 @@ export const SubtitleSettings = () => {
                                             <LanguageIcon01 width={50} height={50} color={"#91003c"}/>
                                         </Button>
                                         Language
+                                    </Space>
+                                </Grid.Item>
+                                <Grid.Item>
+                                    <Space direction={"vertical"} style={{textAlign: "center", width: "100%"}}>
+                                        <Button onClick={() => setIsAdjustingLargeLanguageModel(true)}
+                                                style={{border: "none"}}>
+                                            <LargeModelIcon01 width={50} height={50} color={"#91003c"}/>
+                                        </Button>
+                                        LLM
                                     </Space>
                                 </Grid.Item>
                             </Grid>
@@ -110,6 +123,17 @@ export const SubtitleSettings = () => {
                         <CheckList.Item value={"time"}>Time</CheckList.Item>
                         <CheckList.Item value={"room"}>Room</CheckList.Item>
                         <CheckList.Item value={"speaker"}>Speaker</CheckList.Item>
+                    </CheckList>
+                </DisplayBlock>
+            </Popup>
+
+            <Popup visible={isAdjustingLargeLanguageModel}
+                   onMaskClick={() => setIsAdjustingLargeLanguageModel(false)}>
+                <DisplayBlock title={"Please select the language you need to translate."}>
+                    <CheckList multiple={false} defaultValue={[largeLanguageModel]}
+                               onChange={(value) => webappDispatch(changeLargeLanguageModel(value.at(0) as number))}>
+                        <CheckList.Item value={LargeLanguageModel.WHISPER_TONGYI}>WHISPER_TONGYI</CheckList.Item>
+                        <CheckList.Item value={LargeLanguageModel.WHISPER_M1M200}>WHISPER_M1M200</CheckList.Item>
                     </CheckList>
                 </DisplayBlock>
             </Popup>

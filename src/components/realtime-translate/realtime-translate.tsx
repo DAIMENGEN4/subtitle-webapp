@@ -14,7 +14,7 @@ import log from "@R/log/logging.ts";
 import {SubtitleAssistBall} from "@R/components/realtime-translate/subtitle-assist-ball.tsx";
 import {useJoinRoom} from "@R/components/realtime-translate/hooks/use-join-room.tsx";
 import {setRoomId} from "@R/store/features/session-slice.ts";
-import {useWebappDispatch} from "@R/store/webapp-hook.ts";
+import {useWebappDispatch, useWebappSelector} from "@R/store/webapp-hook.ts";
 
 export const RealtimeTranslate = () => {
     const [volume, setVolume] = useState<number>(0);
@@ -26,6 +26,7 @@ export const RealtimeTranslate = () => {
     const webappDispatch = useWebappDispatch();
     const subtitleContentRef = useRef<HTMLDivElement>(null);
     const realtimeTranslateContainer = useRef<HTMLDivElement>(null);
+    const largeLanguageModel = useWebappSelector(state => state.session.largeLanguageModel);
     const startRecording = useCallback(async () => {
         if (!audioContext) {
             if (roomId) {
@@ -47,7 +48,7 @@ export const RealtimeTranslate = () => {
                         request.setAudioBytes(new Uint8Array(wavBuffer));
                         request.setTargetLanguageList(["cmn", "eng", "jpn"]);
                         request.setTag(new Date().toISOString());
-                        request.setTag64(1);
+                        request.setTag64(largeLanguageModel);
                         chatServiceClient.chatSend(request, {}).then(() => {
                             log.debug("Send audio data...");
                         });
@@ -59,7 +60,7 @@ export const RealtimeTranslate = () => {
         } else {
             audioContext.close().then(() => setAudioContext(undefined));
         }
-    }, [audioContext, chatServiceClient, roomId]);
+    }, [roomId, audioContext, chatServiceClient, largeLanguageModel]);
 
     useEffect(() => {
         const container = subtitleContentRef.current;

@@ -1,5 +1,6 @@
 import {createSlice, PayloadAction} from "@reduxjs/toolkit";
 import {SubtitleInfo} from "@R/model/subtitle-info.ts";
+import {LargeLanguageModel} from "@R/contants/large-language-model.ts";
 
 // Ensure the array has at most 100 items
 const maxSubtitles = 50;
@@ -7,11 +8,13 @@ const maxSubtitles = 50;
 export type SessionStore = {
     roomId?: string;
     subtitleInfos: Array<SubtitleInfo>;
+    largeLanguageModel: number;
 }
 
 const initialState: SessionStore = {
     roomId: undefined,
-    subtitleInfos: []
+    subtitleInfos: [],
+    largeLanguageModel: LargeLanguageModel.WHISPER_M1M200
 };
 
 const sessionSlice = createSlice({
@@ -29,6 +32,9 @@ const sessionSlice = createSlice({
         },
         clearSubtitleInfos(state) {
             state.subtitleInfos = [];
+        },
+        changeLargeLanguageModel(state, action: PayloadAction<number>) {
+            state.largeLanguageModel = action.payload;
         }
     }
 });
@@ -36,6 +42,7 @@ const sessionSlice = createSlice({
 export const {
     setRoomId,
     addSubtitleInfo,
-    clearSubtitleInfos
+    clearSubtitleInfos,
+    changeLargeLanguageModel
 } = sessionSlice.actions;
 export default sessionSlice.reducer;
