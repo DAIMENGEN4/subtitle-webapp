@@ -1,15 +1,15 @@
 class AudioTranslateProcessor extends AudioWorkletProcessor {
-    private inputBuffer: Array<number> = [];
-    private readonly targetFrameSize: number = 320;
-    private readonly targetSampleRate: number = 16000;
-    private readonly nativeSampleRate: number = sampleRate;
+    inputBuffer = [];
+    targetFrameSize = 320;
+    targetSampleRate = 16000;
+    nativeSampleRate = sampleRate;
 
-    constructor(options: AudioWorkletNodeOptions) {
+    constructor(options) {
         super();
         this.targetFrameSize = options.processorOptions.targetFrameSize;
     }
 
-    process(inputs: Float32Array[][]): boolean {
+    process(inputs) {
         // inputs是接收到的音频数据输出
         const arrays = inputs[0][0]; // 只用第一个通道
         const frames = this.resample(arrays);
@@ -19,8 +19,8 @@ class AudioTranslateProcessor extends AudioWorkletProcessor {
         return true;
     }
 
-    private resample(audioFrame: Float32Array): Float32Array[] {
-        const outputFrames: Array<Float32Array> = []
+    resample(audioFrame) {
+        const outputFrames = []
         for (const sample of audioFrame) {
             this.inputBuffer.push(sample);
         }
@@ -31,7 +31,7 @@ class AudioTranslateProcessor extends AudioWorkletProcessor {
         return outputFrames;
     }
 
-    private hasEnoughData(): boolean {
+    hasEnoughData() {
         return (
             (this.inputBuffer.length * this.targetSampleRate) /
             this.nativeSampleRate >=
@@ -39,7 +39,7 @@ class AudioTranslateProcessor extends AudioWorkletProcessor {
         )
     }
 
-    private createOutputDataFrame(): Float32Array {
+    createOutputDataFrame() {
         const outputFrame = new Float32Array(this.targetFrameSize)
         let outputIndex = 0
         let inputIndex = 0

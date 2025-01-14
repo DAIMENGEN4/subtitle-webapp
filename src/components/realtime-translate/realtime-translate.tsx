@@ -31,7 +31,7 @@ export const RealtimeTranslate = () => {
         if (!audioContext) {
             if (roomId) {
                 SileroVadV5.new().then(model => {
-                    const url = new URL("@R/processors/audio-translate-processor.ts", import.meta.url);
+                    const url = new URL("/audio-translate-processor.js", import.meta.url);
                     const href = url.href;
                     wasm.start_realtime_translate(href, async (data: Float32Array) => {
                         const speechProbabilities = await model.process(data);
