@@ -1,5 +1,5 @@
 import "./realtime-translate.scss";
-import {Button} from "antd-mobile";
+import {Button, Toast} from "antd-mobile";
 import {useCallback, useEffect, useRef, useState} from "react";
 import {ConfigProvider, Flex, theme} from "antd";
 import {SubtitleItem} from "@R/components/realtime-translate/subtitle-item.tsx";
@@ -9,46 +9,57 @@ import {SileroVadV5} from "@R/silero/silero-vad-v5.ts";
 import * as wasm from "subtitle-webapp-rust-crate";
 import * as AudioUtils from "@R/utils/audio-utils.ts";
 import {ChatRequest} from "subtitle-webapp-grpc-web";
+import {useParams} from "react-router-dom";
 import log from "@R/log/logging.ts";
 import {SubtitleAssistBall} from "@R/components/realtime-translate/subtitle-assist-ball.tsx";
+import {useJoinRoom} from "@R/components/realtime-translate/hooks/use-join-room.tsx";
+import {setRoomId} from "@R/store/features/session-slice.ts";
+import {useWebappDispatch} from "@R/store/webapp-hook.ts";
 
 export const RealtimeTranslate = () => {
     const [volume, setVolume] = useState<number>(0);
-    const chatServiceClient = useChatServiceClient();
+    const {_roomId} = useParams<{ _roomId: string }>();
+    const {roomId, joinRoom, closeJoinRoom} = useJoinRoom();
     const {subtitleInfos, listenSubtitleInfos} = useChatListen();
+    const chatServiceClient = useChatServiceClient();
     const [audioContext, setAudioContext] = useState<AudioContext | undefined>();
+    const webappDispatch = useWebappDispatch();
     const subtitleContentRef = useRef<HTMLDivElement>(null);
     const realtimeTranslateContainer = useRef<HTMLDivElement>(null);
     const startRecording = useCallback(async () => {
         if (!audioContext) {
-            SileroVadV5.new().then(model => {
-                const url = new URL("@R/processors/audio-translate-processor.ts", import.meta.url);
-                const href = url.href;
-                wasm.start_realtime_translate(href, async (data: Float32Array) => {
-                    const speechProbabilities = await model.process(data);
-                    setVolume(speechProbabilities.isSpeech);
-                    return speechProbabilities.isSpeech;
-                }, (data: Float32Array) => {
-                    const wavBuffer = AudioUtils.encodeWAV(data);
-                    const request = new ChatRequest();
-                    request.setMeetingRoom("wasm");
-                    request.setSpeaker("wasm-speaker");
-                    request.setStart(Math.floor(new Date().getTime() / 1000));
-                    request.setEnd(0);
-                    request.setSampleRate(16000);
-                    request.setAudioBytes(new Uint8Array(wavBuffer));
-                    request.setTargetLanguageList(["cmn", "eng", "jpn"]);
-                    request.setTag(new Date().toISOString());
-                    request.setTag64(1);
-                    chatServiceClient.chatSend(request, {}).then(() => {
-                        log.debug("Send audio data...");
-                    });
-                }).then(setAudioContext).catch(log.error);
-            });
+            if (roomId) {
+                SileroVadV5.new().then(model => {
+                    const url = new URL("@R/processors/audio-translate-processor.ts", import.meta.url);
+                    const href = url.href;
+                    wasm.start_realtime_translate(href, async (data: Float32Array) => {
+                        const speechProbabilities = await model.process(data);
+                        setVolume(speechProbabilities.isSpeech);
+                        return speechProbabilities.isSpeech;
+                    }, (data: Float32Array) => {
+                        const wavBuffer = AudioUtils.encodeWAV(data);
+                        const request = new ChatRequest();
+                        request.setMeetingRoom(roomId);
+                        request.setSpeaker("wasm-speaker");
+                        request.setStart(Math.floor(new Date().getTime() / 1000));
+                        request.setEnd(0);
+                        request.setSampleRate(16000);
+                        request.setAudioBytes(new Uint8Array(wavBuffer));
+                        request.setTargetLanguageList(["cmn", "eng", "jpn"]);
+                        request.setTag(new Date().toISOString());
+                        request.setTag64(1);
+                        chatServiceClient.chatSend(request, {}).then(() => {
+                            log.debug("Send audio data...");
+                        });
+                    }).then(setAudioContext).catch(log.error);
+                });
+            } else {
+                Toast.show({content: "RoomId is null!"});
+            }
         } else {
             audioContext.close().then(() => setAudioContext(undefined));
         }
-    }, [audioContext, chatServiceClient]);
+    }, [audioContext, chatServiceClient, roomId]);
 
     useEffect(() => {
         const container = subtitleContentRef.current;
@@ -60,9 +71,20 @@ export const RealtimeTranslate = () => {
     }, [subtitleInfos]);
 
     useEffect(() => {
-        const stream = listenSubtitleInfos("wasm");
-        return () => stream.cancel();
-    }, [listenSubtitleInfos]);
+        if (roomId) {
+            const stream = listenSubtitleInfos(roomId);
+            return () => stream.cancel();
+        }
+    }, [roomId, _roomId, listenSubtitleInfos]);
+
+    useEffect(() => {
+        if (!roomId && !_roomId) {
+            joinRoom();
+            return () => closeJoinRoom();
+        } else if (_roomId) {
+            webappDispatch(setRoomId(_roomId));
+        }
+    }, [roomId, _roomId, joinRoom, closeJoinRoom, webappDispatch]);
 
     return (
         <div ref={realtimeTranslateContainer} className={"realtime-translate-container"}>
