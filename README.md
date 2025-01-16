@@ -2,11 +2,18 @@
 
 本项目使用 TypeScript 和 Rust WebAssembly 的开发。
 
-#### 项目的基本架构
+#### 访问网址
 
-![](./project-architecture.png)
+备注：公网访问目前存在问题。
 
-#### 项目所使用的基本命令
+内网: [https://subtitleai.advantest.com:39962/](https://subtitleai.advantest.com:39962/)
+公网: [https://smartworkplace.advantest.com.cn:9460/](https://smartworkplace.advantest.com.cn:9460/)
+
+#### 基本架构
+
+![项目架构图](./project-architecture.png)
+
+#### 基本命令
 
 - **`yarn start`**: 启动网站，用于本地开发。
 
