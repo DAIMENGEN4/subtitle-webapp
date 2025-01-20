@@ -8,6 +8,7 @@ export const WebappRoute = () => {
         <Routes>
             <Route path={"/"} element={<HomePage/>}>
                 <Route index element={<RealtimeTranslate/>}/>
+                <Route path={"/:_room"} element={<RealtimeTranslate/>}/>
             </Route>
         </Routes>
     )

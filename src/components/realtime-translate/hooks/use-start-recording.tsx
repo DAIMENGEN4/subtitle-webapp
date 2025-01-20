@@ -11,6 +11,7 @@ export const useStartRecording = () => {
     const [volume, setVolume] = useState<number>(0);
     const chatServiceClient = useChatServiceClient();
     const [audioContext, setAudioContext] = useState<AudioContext | undefined>();
+    const speaker = useWebappSelector(state => state.static.speaker);
     const largeLanguageModel = useWebappSelector(state => state.session.largeLanguageModel);
     const stopRecording = useCallback(() => {
         if (audioContext) {
@@ -29,7 +30,7 @@ export const useStartRecording = () => {
                 const wavBuffer = AudioUtils.encodeWAV(data);
                 const request = new ChatRequest();
                 request.setMeetingRoom(roomId);
-                request.setSpeaker("wasm-speaker");
+                request.setSpeaker(speaker);
                 request.setStart(Math.floor(new Date().getTime() / 1000));
                 request.setEnd(0);
                 request.setSampleRate(16000);
@@ -40,7 +41,7 @@ export const useStartRecording = () => {
                 chatServiceClient.chatSend(request, {}).then();
             }).then(setAudioContext).catch(log.error);
         });
-    }, [chatServiceClient, largeLanguageModel]);
+    }, [chatServiceClient, largeLanguageModel, speaker]);
     return {
         volume: volume,
         isRecording: !!audioContext,

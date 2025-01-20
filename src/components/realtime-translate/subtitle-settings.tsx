@@ -3,7 +3,7 @@ import {Button, Card, CheckList, Grid, Image, Modal, Popup, Slider, Space} from 
 import bubble_webp from "@R/assets/jpeg/bubble.jpeg";
 import {useWebappDispatch, useWebappSelector} from "@R/store/webapp-hook.ts";
 import {SwitchRoomIcon01} from "@R/assets/svg/switch-room-icon-01.tsx";
-import {changeLargeLanguageModel, setRoomId} from "@R/store/features/session-slice.ts";
+import {changeLargeLanguageModel, setRoom} from "@R/store/features/session-slice.ts";
 import {FontSizeIcon01} from "@R/assets/svg/font-size-icon-01.tsx";
 import {LayoutIcon01} from "@R/assets/svg/layout-icon-01.tsx";
 import {LanguageIcon01} from "@R/assets/svg/language-icon-01.tsx";
@@ -21,7 +21,7 @@ export const SubtitleSettings = () => {
     const webappDispatch = useWebappDispatch();
     const [isAdjustingDisplayLayout, setIsAdjustingDisplayLayout] = useState(false);
     const [isAdjustingLargeLanguageModel, setIsAdjustingLargeLanguageModel] = useState(false);
-    const roomId = useWebappSelector(state => state.session.roomId);
+    const room = useWebappSelector(state => state.session.room);
     const fontSize = useWebappSelector(state => state.static.fontSize);
     const displayLayout = useWebappSelector(state => state.static.displayLayout);
     const displayLanguage = useWebappSelector(state => state.static.displayLanguage);
@@ -39,13 +39,13 @@ export const SubtitleSettings = () => {
                 bodyStyle={{paddingTop: "0"}}
                 content={
                     <div className={"subtitle-setting-modal"}>
-                        <Card title={`Room: ${roomId}`} headerStyle={{display: "flex", justifyContent: "center"}}>
+                        <Card title={`Room: ${room}`} headerStyle={{display: "flex", justifyContent: "center"}}>
                             <Grid columns={2}>
                                 <Grid.Item span={2}>
                                     <Space direction={"vertical"} style={{textAlign: "center", width: "100%"}}>
                                         <Button onClick={() => {
                                             setIsAdjustingSetting(false);
-                                            webappDispatch(setRoomId(undefined));
+                                            webappDispatch(setRoom(undefined));
                                         }} style={{border: "none"}}>
                                             <SwitchRoomIcon01 width={50} height={50} color={"#91003c"}/>
                                         </Button>

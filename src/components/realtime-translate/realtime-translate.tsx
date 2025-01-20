@@ -9,18 +9,18 @@ import {SubtitleAssistBall} from "@R/components/realtime-translate/subtitle-assi
 import {useWebappDispatch, useWebappSelector} from "@R/store/webapp-hook.ts";
 import {JoinRoom} from "@R/components/realtime-translate/join-room/join-room.tsx";
 import {StringUtils} from "@R/utils/string-utils.ts";
-import {setRoomId} from "@R/store/features/session-slice.ts";
+import {setRoom} from "@R/store/features/session-slice.ts";
 import {useStartRecording} from "@R/components/realtime-translate/hooks/use-start-recording.tsx";
 
 export const RealtimeTranslate = () => {
-    const {_roomId} = useParams<{ _roomId: string }>();
+    const {_room} = useParams<{ _room: string }>();
     const [visible, setVisible] = useState<boolean>(false);
     const {subtitleInfos, listenSubtitleInfos} = useChatListen();
     const webappDispatch = useWebappDispatch();
     const {volume, isRecording, stopRecording, startRecording} = useStartRecording();
     const subtitleContentRef = useRef<HTMLDivElement>(null);
     const realtimeTranslateContainer = useRef<HTMLDivElement>(null);
-    const roomId = useWebappSelector(state => state.session.roomId);
+    const room = useWebappSelector(state => state.session.room);
 
     useEffect(() => {
         const container = subtitleContentRef.current;
@@ -33,24 +33,24 @@ export const RealtimeTranslate = () => {
     }, [subtitleInfos]);
 
     useEffect(() => {
-        if (roomId) {
-            const stream = listenSubtitleInfos(roomId);
-            Toast.show(`Joined room ${roomId}`);
+        if (room) {
+            const stream = listenSubtitleInfos(room);
+            Toast.show(`Joined room ${room}`);
             return () => stream.cancel();
         }
-    }, [roomId, listenSubtitleInfos]);
+    }, [room, listenSubtitleInfos]);
 
     useEffect(() => {
-        if (StringUtils.hasValue(roomId) || StringUtils.hasValue(_roomId)) {
+        if (StringUtils.hasValue(room) || StringUtils.hasValue(_room)) {
             setVisible(false);
-            if (StringUtils.hasValue(_roomId)) {
-                webappDispatch(setRoomId(_roomId));
+            if (StringUtils.hasValue(_room)) {
+                webappDispatch(setRoom(_room));
             }
         } else {
             stopRecording();
             setVisible(true);
         }
-    }, [roomId, _roomId, webappDispatch, stopRecording]);
+    }, [room, _room, webappDispatch, stopRecording]);
 
     return (
         <>
@@ -79,11 +79,11 @@ export const RealtimeTranslate = () => {
                             "--border-style": "none",
                             "--text-color": "rgba(255, 255, 255, 1)"
                         }} onClick={() => {
-                            if (roomId) {
+                            if (room) {
                                 if (isRecording) {
                                     stopRecording();
                                 } else {
-                                    startRecording(roomId);
+                                    startRecording(room);
                                 }
                             }
                         }}>{isRecording ? "Mute" : "Unmute"}</Button>

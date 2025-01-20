@@ -18,7 +18,7 @@ export const SubtitleItem: React.FC<{
         backgroundImage: 'linear-gradient(97deg, rgba(90,196,255,0.12) 0%, rgba(174,136,255,0.12) 100%)',
         borderStartStartRadius: 4,
     }), []);
-    const roomId = useWebappSelector(state => state.session.roomId);
+    const room = useWebappSelector(state => state.session.room);
     const fontSize = useWebappSelector(state => state.static.fontSize);
     const displayTime = useWebappSelector(state => state.static.displayLayout.includes(SubtitleLayout.TIME));
     const displayRoom = useWebappSelector(state => state.static.displayLayout.includes(SubtitleLayout.ROOM));
@@ -32,8 +32,8 @@ export const SubtitleItem: React.FC<{
                      title={<div className={"text-subtitle-room"} style={{fontSize: 14}}>
                          <Space>
                              {displayTime && <span>{subtitleInfo.time}</span>}
-                             {displayRoom && <span>Room: {roomId}</span>}
-                             {displaySpeaker && <span>Speaker: {subtitleInfo.speaker}</span>}
+                             {displayRoom && <span>{room}</span>}
+                             {displaySpeaker && <span>{subtitleInfo.speaker}</span>}
                          </Space>
                      </div>}
                      description={<div style={{fontSize: fontSize}}>

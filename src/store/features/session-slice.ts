@@ -6,13 +6,13 @@ import {LargeLanguageModel} from "@R/contants/large-language-model.ts";
 const maxSubtitles = 50;
 
 export type SessionStore = {
-    roomId?: string;
+    room?: string;
     subtitleInfos: Array<SubtitleInfo>;
     largeLanguageModel: number;
 }
 
 const initialState: SessionStore = {
-    roomId: undefined,
+    room: undefined,
     subtitleInfos: [],
     largeLanguageModel: LargeLanguageModel.WHISPER_M1M200
 };
@@ -21,8 +21,8 @@ const sessionSlice = createSlice({
     name: "session",
     initialState,
     reducers: {
-        setRoomId(state, action: PayloadAction<string | undefined>) {
-            state.roomId = action.payload;
+        setRoom(state, action: PayloadAction<string | undefined>) {
+            state.room = action.payload;
         },
         addSubtitleInfo(state, action: PayloadAction<SubtitleInfo>) {
             state.subtitleInfos.push(action.payload);
@@ -40,7 +40,7 @@ const sessionSlice = createSlice({
 });
 
 export const {
-    setRoomId,
+    setRoom,
     addSubtitleInfo,
     clearSubtitleInfos,
     changeLargeLanguageModel
