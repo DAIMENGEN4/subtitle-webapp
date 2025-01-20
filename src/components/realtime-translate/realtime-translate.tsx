@@ -47,9 +47,10 @@ export const RealtimeTranslate = () => {
                 webappDispatch(setRoomId(_roomId));
             }
         } else {
+            stopRecording();
             setVisible(true);
         }
-    }, [roomId, _roomId, webappDispatch]);
+    }, [roomId, _roomId, webappDispatch, stopRecording]);
 
     return (
         <>
