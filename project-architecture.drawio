@@ -1,0 +1,58 @@
+<mxfile host="Electron" modified="2025-01-20T01:43:05.355Z" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/21.1.2 Chrome/106.0.5249.199 Electron/21.4.3 Safari/537.36" etag="ksFTQveuD-YfvmqBL3sN" version="21.1.2" type="device">
+  <diagram name="第 1 页" id="O1gVunQUWVo-_ogaK44A">
+    <mxGraphModel dx="2940" dy="1697" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1600" pageHeight="1200" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="e2_WnEYmwCBJXvn1NN1M-15" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;startArrow=classic;startFill=1;strokeWidth=5;" edge="1" parent="1" source="e2_WnEYmwCBJXvn1NN1M-1" target="e2_WnEYmwCBJXvn1NN1M-7">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e2_WnEYmwCBJXvn1NN1M-1" value="" style="whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=none;rounded=1;" vertex="1" parent="1">
+          <mxGeometry x="120" y="200" width="520" height="280" as="geometry" />
+        </mxCell>
+        <mxCell id="e2_WnEYmwCBJXvn1NN1M-2" value="" style="whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=none;rounded=1;" vertex="1" parent="1">
+          <mxGeometry x="1760" y="200" width="520" height="280" as="geometry" />
+        </mxCell>
+        <mxCell id="e2_WnEYmwCBJXvn1NN1M-4" value="&lt;font style=&quot;font-size: 20px;&quot;&gt;http://10.150.117.243:39962&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="160" y="320" width="280" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="e2_WnEYmwCBJXvn1NN1M-5" value="&lt;font style=&quot;font-size: 20px;&quot;&gt;https://subtitleai.advantest.com:39962&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="160" y="360" width="360" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="e2_WnEYmwCBJXvn1NN1M-6" value="&lt;font style=&quot;font-size: 20px;&quot;&gt;https://smartworkplace.advantest.com.cn:9460&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="160" y="400" width="440" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="e2_WnEYmwCBJXvn1NN1M-16" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;strokeWidth=5;startArrow=classic;startFill=1;" edge="1" parent="1" source="e2_WnEYmwCBJXvn1NN1M-7" target="e2_WnEYmwCBJXvn1NN1M-2">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e2_WnEYmwCBJXvn1NN1M-7" value="" style="whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=none;rounded=1;" vertex="1" parent="1">
+          <mxGeometry x="920" y="200" width="520" height="280" as="geometry" />
+        </mxCell>
+        <mxCell id="e2_WnEYmwCBJXvn1NN1M-8" value="&lt;font style=&quot;font-size: 50px;&quot;&gt;Web Server (Nginx)&lt;/font&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="145" y="230" width="470" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="e2_WnEYmwCBJXvn1NN1M-9" value="&lt;font style=&quot;font-size: 20px;&quot;&gt;http://10.150.117.243:39447&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="960" y="320" width="280" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="e2_WnEYmwCBJXvn1NN1M-10" value="&lt;font style=&quot;font-size: 20px;&quot;&gt;https://subtitleai.advantest.com:39447&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="960" y="360" width="360" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="e2_WnEYmwCBJXvn1NN1M-12" value="&lt;font style=&quot;font-size: 50px;&quot;&gt;Proxy Server (Envoy)&lt;/font&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="935" y="230" width="490" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="e2_WnEYmwCBJXvn1NN1M-13" value="&lt;font style=&quot;font-size: 20px;&quot;&gt;http://10.150.115.103:50051&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="1800" y="320" width="280" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="e2_WnEYmwCBJXvn1NN1M-14" value="&lt;font style=&quot;font-size: 50px;&quot;&gt;&amp;nbsp;Server (Python)&lt;/font&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="1775" y="230" width="490" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="e2_WnEYmwCBJXvn1NN1M-17" value="&lt;font style=&quot;font-size: 30px;&quot;&gt;HTTP&lt;/font&gt;" style="ellipse;shape=cloud;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="690" y="250" width="180" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="e2_WnEYmwCBJXvn1NN1M-19" value="&lt;font style=&quot;font-size: 30px;&quot;&gt;GRPC&lt;/font&gt;" style="ellipse;shape=cloud;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="1510" y="250" width="180" height="80" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
