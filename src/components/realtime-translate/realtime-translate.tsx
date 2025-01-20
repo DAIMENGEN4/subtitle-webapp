@@ -1,5 +1,5 @@
 import "./realtime-translate.scss";
-import {Button} from "antd-mobile";
+import {Button, Toast} from "antd-mobile";
 import {useEffect, useRef, useState} from "react";
 import {ConfigProvider, Flex, theme} from "antd";
 import {SubtitleItem} from "@R/components/realtime-translate/subtitle-item.tsx";
@@ -35,6 +35,7 @@ export const RealtimeTranslate = () => {
     useEffect(() => {
         if (roomId) {
             const stream = listenSubtitleInfos(roomId);
+            Toast.show(`Joined room ${roomId}`);
             return () => stream.cancel();
         }
     }, [roomId, listenSubtitleInfos]);
