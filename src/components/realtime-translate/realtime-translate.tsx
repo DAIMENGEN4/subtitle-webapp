@@ -86,7 +86,7 @@ export const RealtimeTranslate = () => {
                                     startRecording(roomId);
                                 }
                             }
-                        }}>{isRecording ? "Stop Recording" : "Start Recording"}</Button>
+                        }}>{isRecording ? "Mute" : "Unmute"}</Button>
                     </div>
                 </div>
                 <SubtitleAssistBall parent={realtimeTranslateContainer}/>
