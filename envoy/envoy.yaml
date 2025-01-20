@@ -44,6 +44,7 @@ static_resources:
                   - name: envoy.filters.http.router
                     typed_config:
                       "@type": type.googleapis.com/envoy.extensions.filters.http.router.v3.Router
+    # https://[0.0.0.0]
     - name: listener_https_custom_mkcert
       address:
         socket_address: { address: 0.0.0.0, port_value: 9903}
@@ -85,13 +86,14 @@ static_resources:
           transport_socket:
             name: envoy.transport_sockets.tls
             typed_config:
-                "@type": type.googleapis.com/envoy.extensions.transport_sockets.tls.v3.DownstreamTlsContext
-                common_tls_context:
-                    tls_certificates:
-                    - certificate_chain:
-                        filename: /etc/envoy/certs/servercert.pem
-                      private_key:
-                        filename: /etc/envoy/certs/serverkey.pem
+              "@type": type.googleapis.com/envoy.extensions.transport_sockets.tls.v3.DownstreamTlsContext
+              common_tls_context:
+                tls_certificates:
+                  - certificate_chain:
+                      filename: /etc/envoy/certs/servercert.pem
+                    private_key:
+                      filename: /etc/envoy/certs/serverkey.pem
+    # https://subtitleai.advantest.com
     - name: listener_https_advantest_mkcert
       address:
         socket_address: { address: 0.0.0.0, port_value: 9904}
@@ -133,13 +135,13 @@ static_resources:
           transport_socket:
             name: envoy.transport_sockets.tls
             typed_config:
-                "@type": type.googleapis.com/envoy.extensions.transport_sockets.tls.v3.DownstreamTlsContext
-                common_tls_context:
-                    tls_certificates:
-                    - certificate_chain:
-                        filename: /etc/envoy/certs/star_advantest_com.crt
-                      private_key:
-                        filename: /etc/envoy/certs/star_advantest_com.key
+              "@type": type.googleapis.com/envoy.extensions.transport_sockets.tls.v3.DownstreamTlsContext
+              common_tls_context:
+                tls_certificates:
+                  - certificate_chain:
+                      filename: /etc/envoy/certs/star_advantest_com.crt
+                    private_key:
+                      filename: /etc/envoy/certs/star_advantest_com.key
   clusters:
     - name: translate_service_103
       connect_timeout: 0.25s
