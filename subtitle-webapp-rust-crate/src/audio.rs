@@ -91,7 +91,7 @@ pub async fn start_realtime_translate(
         &audio_worklet_node_options,
     );
     let message_port = audio_worklet_node.port().unwrap();
-    let max_audio_gain = 2f32;
+    let max_audio_gain = 1f32;
     let mut current_audio_gain = 1f32;
     let closure = Closure::wrap(Box::new(move |event: web_sys::MessageEvent| {
         let audio_frame = js_sys::Float32Array::new(&event.data()).to_vec();
