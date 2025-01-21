@@ -90,7 +90,7 @@ fn capture_speech_frames(
     vad_callback: js_sys::Function,
     send_callback: js_sys::Function,
 ) -> tokio::sync::mpsc::Sender<Vec<f32>> {
-    let (tx, mut rx) = tokio::sync::mpsc::channel::<Vec<f32>>(32);
+    let (tx, mut rx) = tokio::sync::mpsc::channel::<Vec<f32>>(2048);
     wasm_bindgen_futures::spawn_local(async move {
         let min_speech_frames = 16;
         let positive_speech_threshold = 0.75f64;
