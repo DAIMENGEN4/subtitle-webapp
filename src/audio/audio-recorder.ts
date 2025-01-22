@@ -1,9 +1,10 @@
 import {SileroVadV5} from "@R/silero/silero-vad-v5.ts";
+import Worker from "../worker/worker?worker";
+import WorkletUrl from "../worklet/worklet?worker&url";
 
 export class AudioRecorder {
     private readonly minSpeechFrames = 16;
     private readonly positiveSpeechThreshold = 0.75;
-    private readonly workletUrl: URL;
     private readonly gainNode: GainNode;
     private readonly audioContext: AudioContext;
     private volumeListener?: (volume: number) => void;
@@ -13,7 +14,6 @@ export class AudioRecorder {
         this.audioContext = new AudioContext();
         this.gainNode = this.audioContext.createGain();
         this.gainNode.gain.value = 2;
-        this.workletUrl = new URL("/audio-worklet.js", import.meta.url);
     }
 
     /**
@@ -26,7 +26,7 @@ export class AudioRecorder {
             const mediaStream = await navigator.mediaDevices.getUserMedia({audio: true});
             const mediaStreamSourceNode = this.audioContext.createMediaStreamSource(mediaStream);
             // Load the audio worklet module
-            await this.audioContext.audioWorklet.addModule(this.workletUrl);
+            await this.audioContext.audioWorklet.addModule(WorkletUrl);
             // Configure AudioWorkletNode
             const audioWorkletNode = this.createAudioWorkletNode(sileroVadV5, send);
             // Connect nodes
@@ -50,8 +50,10 @@ export class AudioRecorder {
         const audioWorkletNode = new AudioWorkletNode(this.audioContext, "AudioWorklet", {
             processorOptions: {targetFrameSize: 512},
         });
+        const worker = new Worker();
         audioWorkletNode.port.onmessage = async (event) => {
             const audioFrame: Float32Array = event.data;
+            worker.postMessage(audioFrame);
             try {
                 const {isSpeech} = await sileroVadV5.process(audioFrame);
                 this.volumeListener?.(isSpeech);
