@@ -7,33 +7,35 @@ import {ChatRequest} from "subtitle-webapp-grpc-web";
 import {LargeLanguageModel} from "@R/contants/large-language-model.ts";
 
 export class AudioService {
-    private readonly worker: Worker;
+    private worker?: Worker;
+    private audioContext?: AudioContext;
     private readonly chatServiceClient: ChatServiceClient;
+    private speaker: string = "unknown";
     private largeLanguageModel: number = LargeLanguageModel.WHISPER_M1M200;
-    private volumeListener?: (volume: number) => void;
+    private listener?: (volume: number) => void;
 
     constructor() {
-        this.worker = new Worker();
         const options = null;
         const credentials = null;
         this.chatServiceClient = new ChatServiceClient(hostname, credentials, options);
     }
 
-    async startRealtimeTranslate(room: string, speaker: string) {
-        const audioContext: AudioContext = new AudioContext();
-        const gainNode = audioContext.createGain();
+    async start(room: string): Promise<boolean> {
+        this.worker = new Worker();
+        this.audioContext = new AudioContext();
+        const gainNode = this.audioContext.createGain();
         const mediaStream = await navigator.mediaDevices.getUserMedia({audio: true});
-        const mediaStreamSourceNode = audioContext.createMediaStreamSource(mediaStream);
+        const mediaStreamSourceNode = this.audioContext.createMediaStreamSource(mediaStream);
         // Load the audio worklet module
-        await audioContext.audioWorklet.addModule(WorkletUrl);
+        await this.audioContext.audioWorklet.addModule(WorkletUrl);
         // Configure AudioWorkletNode
-        const audioWorkletNode = new AudioWorkletNode(audioContext, "AudioWorklet", {
+        const audioWorkletNode = new AudioWorkletNode(this.audioContext, "AudioWorklet", {
             processorOptions: {targetFrameSize: 512},
         });
         // Listen to audio frames
         audioWorkletNode.port.onmessage = async (event) => {
             const audioFrame: Float32Array = event.data;
-            this.worker.postMessage(audioFrame);
+            this.worker?.postMessage(audioFrame);
         };
         // Listen to volume
         this.worker.onmessage = (event) => {
@@ -41,11 +43,10 @@ export class AudioService {
             const content = eventData.content;
             switch (eventData.type) {
                 case "speechData": {
-                    console.log("largeLanguageModel: ", this.largeLanguageModel);
                     const wavBuffer = AudioUtils.encodeWAV(content);
                     const request = new ChatRequest();
                     request.setMeetingRoom(room);
-                    request.setSpeaker(speaker);
+                    request.setSpeaker(this.speaker);
                     request.setStart(Math.floor(new Date().getTime() / 1000));
                     request.setEnd(0);
                     request.setSampleRate(16000);
@@ -57,7 +58,7 @@ export class AudioService {
                     break;
                 }
                 case "speechThreshold":
-                    if (this.volumeListener) this.volumeListener(content);
+                    if (this.listener) this.listener(content);
                     break;
                 default:
                     break;
@@ -67,15 +68,29 @@ export class AudioService {
         mediaStreamSourceNode
             .connect(gainNode)
             .connect(audioWorkletNode)
-            .connect(audioContext.destination);
-        return audioContext;
+            .connect(this.audioContext.destination);
+        return true;
     }
 
-    setLargeLanguageModel(model: number) {
+    async stop() {
+        this.worker?.terminate();
+        await this.audioContext?.close();
+        return false;
+    }
+
+    setModel(model: number) {
         this.largeLanguageModel = model;
     }
 
-    addVolumeListener(listener: (volume: number) => void): void {
-        this.volumeListener = listener;
+    setSpeaker(speaker: string) {
+        this.speaker = speaker;
+    }
+
+    addListener(listener: (volume: number) => void): void {
+        this.listener = listener;
+    }
+
+    removeListener(): void {
+        this.listener = undefined;
     }
 }
