@@ -21,6 +21,7 @@ export const RealtimeTranslate = () => {
     const subtitleContentRef = useRef<HTMLDivElement>(null);
     const realtimeTranslateContainer = useRef<HTMLDivElement>(null);
     const room = useWebappSelector(state => state.session.room);
+    const speaker = useWebappSelector(state => state.static.speaker);
 
     useEffect(() => {
         const container = subtitleContentRef.current;
@@ -83,7 +84,7 @@ export const RealtimeTranslate = () => {
                                 if (isRecording) {
                                     stopRecording();
                                 } else {
-                                    startRecording(room);
+                                    startRecording(room, speaker);
                                 }
                             }
                         }}>{isRecording ? "Mute" : "Unmute"}</Button>
