@@ -1,6 +1,6 @@
 import {hostname} from "@R/host.ts";
-import Worker from "../worker/worker?worker";
-import WorkletUrl from "../worklet/worklet?worker&url";
+import Worker from "@R/audio/worker/worker?worker";
+import WorkletUrl from "@R/audio/worklet/worklet?worker&url";
 import {ChatServiceClient} from "subtitle-webapp-grpc-web/ChatServiceClientPb";
 import * as AudioUtils from "@R/utils/audio-utils.ts";
 import {ChatRequest} from "subtitle-webapp-grpc-web";
