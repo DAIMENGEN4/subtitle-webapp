@@ -6,28 +6,26 @@ const positiveSpeechThreshold = 0.75;
 const audioBuffer: Array<AudioFrame> = [];
 let sileroVadV5: SileroVadV5 | undefined;
 
-const initializeSileroVadV5 = async () => {
-    if (!sileroVadV5) {
-        sileroVadV5 = await SileroVadV5.new();
-    }
-};
+SileroVadV5.new().then((vad) => {
+    sileroVadV5 = vad;
+});
 
 self.onmessage = async (event) => {
-    await initializeSileroVadV5();
     await processAudioFrame(event.data);
 };
 
 const processAudioFrame = async (
     audioFrame: Float32Array
 ) => {
-    if (!sileroVadV5) sileroVadV5 = await SileroVadV5.new();
-    const {isSpeech} = await sileroVadV5.process(audioFrame);
-    self.postMessage({type: "speechThreshold", content: isSpeech});
-    audioBuffer.unshift({speechThreshold: isSpeech, audioFrame});
-    trimAudioBuffer(audioBuffer, minSpeechFrames, positiveSpeechThreshold);
-    if (shouldSendAudioData(audioBuffer, minSpeechFrames)) {
-        const speechData = aggregateAudioData(audioBuffer);
-        self.postMessage({type: "speechData", content: speechData});
+    if (sileroVadV5) {
+        const {isSpeech} = await sileroVadV5.process(audioFrame);
+        self.postMessage({type: "speechThreshold", content: isSpeech});
+        audioBuffer.unshift({speechThreshold: isSpeech, audioFrame});
+        trimAudioBuffer(audioBuffer, minSpeechFrames, positiveSpeechThreshold);
+        if (shouldSendAudioData(audioBuffer, minSpeechFrames)) {
+            const speechData = aggregateAudioData(audioBuffer);
+            self.postMessage({type: "speechData", content: speechData});
+        }
     }
 }
 
