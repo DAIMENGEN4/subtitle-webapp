@@ -1,6 +1,6 @@
 import "./join-room.scss";
 import React, {useCallback} from "react";
-import {Button, CenterPopup, Form, Input} from "antd-mobile";
+import {Button, CenterPopup, Form, Input, Toast} from "antd-mobile";
 import {useWebappDispatch, useWebappSelector} from "@R/store/webapp-hook.ts";
 import {setRoom} from "@R/store/features/session-slice.ts";
 import {setSpeaker} from "@R/store/features/static-slice.ts";
@@ -11,6 +11,10 @@ export const JoinRoom: React.FC<{ visible: boolean }> = ({visible}) => {
     const speaker = useWebappSelector(state => state.static.speaker)
     const onSubmit = useCallback(() => {
         const values: { room: string, speaker: string } = form.getFieldsValue();
+        if (!values.room || !values.speaker) {
+            Toast.show("Please input room number and your name");
+            return;
+        }
         const room = values.room;
         const speaker = values.speaker;
         webappDispatch(setRoom(room));

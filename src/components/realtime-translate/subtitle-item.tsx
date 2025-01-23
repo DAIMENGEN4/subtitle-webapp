@@ -2,7 +2,7 @@ import * as React from "react";
 import {useMemo} from "react";
 import {Welcome} from "@ant-design/x";
 import {Space} from "antd-mobile";
-import {SubtitleInfo} from "@R/model/subtitle-info.ts";
+import {SubtitleInfo} from "@R/info/subtitle-info.ts";
 import {useWebappSelector} from "@R/store/webapp-hook.ts";
 import {Language} from "@R/contants/language.ts";
 import {SubtitleLayout} from "@R/contants/subtitle-layout.ts";

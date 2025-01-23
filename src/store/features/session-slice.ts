@@ -1,5 +1,5 @@
 import {createSlice, PayloadAction} from "@reduxjs/toolkit";
-import {SubtitleInfo} from "@R/model/subtitle-info.ts";
+import {SubtitleInfo} from "@R/info/subtitle-info.ts";
 import {LargeLanguageModel} from "@R/contants/large-language-model.ts";
 
 // Ensure the array has at most 100 items

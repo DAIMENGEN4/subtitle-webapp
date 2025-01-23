@@ -1,7 +1,7 @@
 import {useCallback} from "react";
 import {Toast} from "antd-mobile";
 import {RpcError} from "grpc-web";
-import {SubtitleInfo} from "@R/model/subtitle-info.ts";
+import {SubtitleInfo} from "@R/info/subtitle-info.ts";
 import {ChatRespond, MeetingRoom} from "subtitle-webapp-grpc-web";
 import {addSubtitleInfo} from "@R/store/features/session-slice.ts";
 import {useWebappDispatch, useWebappSelector} from "@R/store/webapp-hook.ts";
