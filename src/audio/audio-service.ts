@@ -33,9 +33,9 @@ export class AudioService {
             processorOptions: {targetFrameSize: 512},
         });
         // Listen to audio frames
-        audioWorkletNode.port.onmessage = async (event) => {
+        audioWorkletNode.port.onmessage = (event) => {
             const audioFrame: Float32Array = event.data;
-            this.worker?.postMessage(audioFrame);
+            this.worker?.postMessage(audioFrame, [audioFrame.buffer]);
         };
         // Listen to volume
         this.worker.onmessage = (event) => {

@@ -2,7 +2,7 @@
 
 ### Release 
 目前的稳定版本是下面的两个版本，线上测试暂时没有问题。
-* 10.150.111.250/daimengen/subtitle-webapp:v2.2.6
+* 10.150.111.250/daimengen/subtitle-webapp:v2.2.7
 * 10.150.111.250/daimengen/subtitle-webapp-proxy:v2.1
 
 本项目是一款跨平台的实时语音翻译 Web 应用，旨在为用户提供高效、便捷的语音翻译服务。通过结合 TypeScript 和 Rust WebAssembly 的强大功能，我们提供了高效、精准且低延迟的语音翻译服务，助力用户轻松突破语言障碍，畅享无缝沟通。   
