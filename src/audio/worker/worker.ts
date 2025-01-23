@@ -1,14 +1,12 @@
+import init, * as wasm from "subtitle-webapp-rust-crate";
 import {SileroVadV5} from "@R/silero/silero-vad-v5.ts";
 
 type AudioFrame = { speechThreshold: number; audioFrame: Float32Array };
 const minSpeechFrames = 16;
 const positiveSpeechThreshold = 0.75;
 const audioBuffer: Array<AudioFrame> = [];
-let sileroVadV5: SileroVadV5 | undefined;
-
-SileroVadV5.new().then((vad) => {
-    sileroVadV5 = vad;
-});
+const sileroVadV5 = await SileroVadV5.new();
+await init();
 
 self.onmessage = async (event) => {
     await processAudioFrame(event.data);
@@ -53,7 +51,7 @@ const shouldSendAudioData = (
     const thresholds = audioBuffer
         .slice(0, minSpeechFrames)
         .map(frame => frame.speechThreshold);
-    return isMonotonicallyDecreasing(thresholds, 5);
+    return wasm.is_decreasing(new Float64Array(thresholds), 5);
 }
 
 const aggregateAudioData = (
@@ -70,10 +68,4 @@ const aggregateAudioData = (
         }
     }
     return audioData;
-}
-
-const isMonotonicallyDecreasing = (input: number[], tolerance: number) => {
-    const n = tolerance;
-    const avg = input.slice(n).reduce((acc, val) => acc + val, 0) / (input.length - n);
-    return input.slice(0, n).every(value => value <= avg * 0.75);
 }
