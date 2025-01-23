@@ -19,7 +19,8 @@ export class SubtitleInfo {
         const chineseIndex = languageList.indexOf(Language.CHINESE);
         const englishIndex = languageList.indexOf(Language.ENGLISH);
         const japaneseIndex = languageList.indexOf(Language.JAPANESE);
-        this.time = dayjs.unix(response.getStart()).utc().format("HH:mm:ss");
+        // this.time = dayjs.unix(response.getStart()).utc().format("HH:mm:ss");
+        this.time = dayjs().format("HH:mm:ss");
         this.chinese = chineseIndex !== -1 ? subtitleList[chineseIndex] : "";
         this.english = englishIndex !== -1 ? subtitleList[englishIndex] : "";
         this.japanese = japaneseIndex !== -1 ? subtitleList[japaneseIndex] : "";

@@ -15,7 +15,7 @@ import {useStartRecording} from "@R/components/realtime-translate/hooks/use-star
 export const RealtimeTranslate = () => {
     const {_room} = useParams<{ _room: string }>();
     const [visible, setVisible] = useState<boolean>(false);
-    const {subtitleInfos, listenSubtitleInfos} = useChatListen();
+    const {reconnect, subtitleInfos, listenSubtitleInfos} = useChatListen();
     const webappDispatch = useWebappDispatch();
     const {volume, isRecording, stopRecording, startRecording} = useStartRecording();
     const subtitleContentRef = useRef<HTMLDivElement>(null);
@@ -37,7 +37,7 @@ export const RealtimeTranslate = () => {
             Toast.show(`Joined room ${room}`);
             return () => stream.cancel();
         }
-    }, [room, listenSubtitleInfos]);
+    }, [room, reconnect, listenSubtitleInfos]);
 
     useEffect(() => {
         if (StringUtils.hasValue(room) || StringUtils.hasValue(_room)) {
